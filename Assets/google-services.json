@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "618225046448",
+    "project_id": "noticeboard-60361",
+    "storage_bucket": "noticeboard-60361.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:618225046448:android:997f0b7789e16f0781bc75",
+        "android_client_info": {
+          "package_name": "com.DefaultCompany.noticeboard"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFjSoTuIlV0P5cl6QeCdfFGhjgbxmisxA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
