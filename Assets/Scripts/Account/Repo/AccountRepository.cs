@@ -63,11 +63,25 @@ public class AccountRepository
                 var snapshot = snapshotTask.Result;
                 if (snapshot.Exists)
                 {
-                    AccountDTO dto = snapshot.ConvertTo<AccountDTO>();
-                    var account = dto.ToDomain();
-                    _myAccount = account; // 로그인 성공 시 _myAccount에 할당
-                    Debug.Log($"MyAccount 할당 완료: {account.Email}, {account.Nickname}");
-                    onSuccess?.Invoke(account);
+                    var data = snapshot.ToDictionary();
+                    if (data != null)
+                    {
+                        // 각 필드를 안전하게 꺼내서 DTO에 할당
+                        string email = data.ContainsKey("Email") ? data["Email"] as string : null;
+                        string nickname = data.ContainsKey("Nickname") ? data["Nickname"] as string : null;
+                        string password = data.ContainsKey("Password") ? data["Password"] as string : null;
+
+                        var dto = new AccountDTO(email, nickname, password);
+                        var account = dto.ToDomain();
+                        _myAccount = account;
+                        Debug.Log($"MyAccount 할당 완료: {account.Email}, {account.Nickname}");
+                        onSuccess?.Invoke(account);
+                    }
+                    else
+                    {
+                        onError?.Invoke("UserDB에서 데이터를 불러오지 못했습니다.");
+                        Debug.LogWarning("UserDB에서 데이터를 불러오지 못했습니다.");
+                    }
                 }
                 else
                 {
