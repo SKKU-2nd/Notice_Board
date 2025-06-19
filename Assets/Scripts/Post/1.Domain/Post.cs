@@ -12,7 +12,6 @@ public class Post
     public DateTime CreatedAt { get; private set; } // 작성 일자
     private List<string> _likeUserIDList;           // 좋아요 누른 사람들 (유저의 고유 ID)
     public List<string> LikeUserIDList => _likeUserIDList;
-    public int LikeCount => _likeUserIDList.Count;  // 좋아요 수
     public int CommentCount { get; private set; }   // 댓글 수 (게시판에서는 댓글 수만 보이기 때문에 따로 저장)
 
     // 생성자

@@ -31,7 +31,7 @@ public class PostManager : MonoSingleton<PostManager>
         string postId = docRef.Id;
 
         var post = new Post(postId, authorId, content, DateTime.UtcNow, new List<string>(), 0);
-        var postDto = new PostDTO(post);
+        var postDto = post.ToDto();
 
         await _postRepository.AddPost(docRef, postDto);
     }
@@ -58,7 +58,7 @@ public class PostManager : MonoSingleton<PostManager>
         var post = new Post(postDto);
 
         post.Edit(editorId, newContent);
-        await _postRepository.UpdatePost(new PostDTO(post));
+        await _postRepository.UpdatePost(post.ToDto());
     }
 
     public async Task DeletePost(string postId, string requesterId)
@@ -88,7 +88,7 @@ public class PostManager : MonoSingleton<PostManager>
         var post = new Post(postDto);
 
         bool isLiked = post.SetLike(userId);
-        await _postRepository.UpdatePost(new PostDTO(post));
+        await _postRepository.UpdatePost(post.ToDto());
 
         return isLiked;
     }
@@ -101,7 +101,7 @@ public class PostManager : MonoSingleton<PostManager>
         var post = new Post(postDto);
 
         post.SetCommentCount(postDto.CommentCount + 1);
-        await _postRepository.UpdatePost(new PostDTO(post));
+        await _postRepository.UpdatePost(post.ToDto());
     }
 
     public IReadOnlyList<PostDTO> GetCachedPosts() => _posts;
