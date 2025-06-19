@@ -17,7 +17,7 @@ public class AccountRepository
     private FirebaseFirestore DB => FirebaseManager.Instance.DB;
 
     // 로그인
-    public void Login(string email, string password, Action<Account> onSuccess = null, Action<string> onError = null)
+    public void SignIn(string email, string password, Action<Account> onSuccess = null, Action<string> onError = null)
     {
         if (Auth == null)
         {
@@ -92,6 +92,19 @@ public class AccountRepository
         });
     }
 
+
+    public void SignOut()
+    {
+        if (Auth == null)
+        {
+            Debug.LogError("Firebase 인증이 초기화되지 않았습니다.");
+            return;
+        }
+        Auth.SignOut();
+        _myAccount = null; // 로그아웃 시 MyAccount를 null로 설정
+        Debug.Log("로그아웃 성공");
+    }
+
     // 계정 생성(닉 없음)
     public void CreateAccount(string email, string password, Action<Account> onSuccess = null, Action<string> onError = null)
     {
@@ -142,6 +155,7 @@ public class AccountRepository
         });
     }
 
+    //계정 생성(닉 받음)
     public void CreateAccount(string email, string nickname, string password, Action<Account> onSuccess = null, Action<string> onError = null)
     {
         if (Auth == null)

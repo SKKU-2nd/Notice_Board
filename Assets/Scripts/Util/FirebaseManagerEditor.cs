@@ -13,6 +13,7 @@ public class FirebaseManagerEditor : EditorWindow
     private string signupNickname = "";
     private string signupEmail = "";
     private string signupPassword = "";
+    private string signupPasswordConfirm = "";
 
     [MenuItem("Tools/Firebase 로그인 테스트")]
     public static void ShowWindow()
@@ -53,13 +54,35 @@ public class FirebaseManagerEditor : EditorWindow
 
         GUILayout.Space(10);
 
+        if (GUILayout.Button("로그아웃 시도"))
+        {
+            var manager = AccountManager.Instance;
+            if (manager != null)
+            {
+                manager.SignOut();
+                Debug.Log("로그아웃 완료");
+            }
+            else
+            {
+                EditorUtility.DisplayDialog("오류", "FirebaseManager 싱글톤 인스턴스를 찾을 수 없습니다.", "확인");
+            }
+        }
 
+        GUILayout.Space(10);
+
+        GUILayout.Label("사용자 커스텀 계정 생성", EditorStyles.boldLabel);
         signupNickname = EditorGUILayout.TextField("닉네임", signupNickname);
         signupEmail = EditorGUILayout.TextField("이메일", signupEmail);
         signupPassword = EditorGUILayout.TextField("비밀번호", signupPassword);
-
+        signupPasswordConfirm = EditorGUILayout.TextField("비밀번호 확인", signupPasswordConfirm);
         if (GUILayout.Button("계정 생성"))
         {
+            if (signupPassword != signupPasswordConfirm)
+            {
+                EditorUtility.DisplayDialog("오류", "비밀번호와 비밀번호 확인이 일치하지 않습니다.", "확인");
+                return;
+            }
+
             var repo = new AccountRepository();
             repo.CreateAccount(signupEmail, signupNickname, signupPassword,
                 account => Debug.Log("계정 생성 성공: " + account.Email),
@@ -68,6 +91,7 @@ public class FirebaseManagerEditor : EditorWindow
 
         GUILayout.Space(10);
 
+        GUILayout.Label("분신술", EditorStyles.boldLabel);
         if (GUILayout.Button("무작위 계정 1개 생성"))
         {
             var repo = new AccountRepository();
@@ -82,51 +106,6 @@ public class FirebaseManagerEditor : EditorWindow
         }
 
         GUILayout.Space(10);
-
-        if (GUILayout.Button("유저 정보 초기화"))
-        {
-            var db = FirebaseManager.Instance.DB;
-            if (db == null)
-            {
-                Debug.LogError("Firestore가 초기화되지 않았습니다.");
-                return;
-            }
-
-            db.Collection("UserDB").GetSnapshotAsync().ContinueWithOnMainThread(task =>
-            {
-                if (task.IsFaulted || task.IsCanceled)
-                {
-                    Debug.LogError("UserDB 전체 조회 실패: " + task.Exception);
-                    return;
-                }
-
-                var snapshot = task.Result;
-                int total = snapshot.Count;
-                int deleted = 0;
-
-                foreach (var doc in snapshot.Documents)
-                {
-                    db.Collection("UserDB").Document(doc.Id).DeleteAsync().ContinueWithOnMainThread(deleteTask =>
-                    {
-                        if (deleteTask.IsFaulted || deleteTask.IsCanceled)
-                        {
-                            Debug.LogError($"문서 삭제 실패: {doc.Id} / {deleteTask.Exception}");
-                        }
-                        else
-                        {
-                            deleted++;
-                            Debug.Log($"문서 삭제 성공: {doc.Id} ({deleted}/{total})");
-                        }
-                    });
-                }
-
-                if (total == 0)
-                {
-                    Debug.Log("UserDB에 삭제할 문서가 없습니다.");
-                }
-            });
-        }
-
 
     }
     // 임의의 10자리 비밀번호 생성 함수

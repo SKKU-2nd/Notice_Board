@@ -26,7 +26,7 @@ public class AccountManager : MonoSingleton<AccountManager>
 
     public void Login()
     {
-        _repo.Login(_email, _password,
+        _repo.SignIn(_email, _password,
             account => {
                 MyAccount = account;
                 Debug.Log("로그인 및 MyAccount 할당 완료");
@@ -45,5 +45,11 @@ public class AccountManager : MonoSingleton<AccountManager>
             error => {
                 Debug.LogError(error);
             });
+    }
+
+    public void SignOut()
+    {
+        _repo.SignOut();
+        Debug.Log("로그아웃 및 MyAccount 초기화 완료");
     }
 }
