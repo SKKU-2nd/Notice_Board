@@ -40,7 +40,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 600, y: 0}
+  m_SizeDelta: {x: 512, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &87503263191300273
 CanvasRenderer:
@@ -175,7 +175,7 @@ GameObject:
   - component: {fileID: 2269670898008524350}
   - component: {fileID: 2521389537557605822}
   - component: {fileID: 754176994823462525}
-  - component: {fileID: 5273414735203205221}
+  - component: {fileID: 1987337829300886666}
   - component: {fileID: 6416543049494394167}
   m_Layer: 5
   m_Name: PostPreviewText
@@ -302,7 +302,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &5273414735203205221
+--- !u!114 &1987337829300886666
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -311,9 +311,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5786081614551846674}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f751913aa3ed8b74dbe44bd1387c89d8, type: 3}
+  m_Script: {fileID: 11500000, guid: 148e0f61540a48e7a61da5b47e3aa025, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ContentTextUI: {fileID: 754176994823462525}
 --- !u!114 &6416543049494394167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -363,7 +364,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 35, y: -81.21}
+  m_AnchoredPosition: {x: 35, y: -850.8}
   m_SizeDelta: {x: 320, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &4949046167760504653
