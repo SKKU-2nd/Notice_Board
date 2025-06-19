@@ -1,9 +1,6 @@
-using Firebase.Auth;
-using Firebase.Extensions;
-using Firebase.Firestore;
 using UnityEngine;
-using TMPro;
 using System;
+using System.Threading.Tasks;
 
 public class AccountManager : MonoSingleton<AccountManager>
 {
@@ -92,9 +89,9 @@ public class AccountManager : MonoSingleton<AccountManager>
     }
 
     //Email로 유저 DTO 가져오기
-    public void GetAccountDTOByEmail(string email, Action<AccountDTO> onSuccess, Action<string> onError = null)
+    public async Task<AccountDTO> GetAccountDTOByEmail(string email)
     {
-        _repo.GetAccountDTOByEmail(email, onSuccess, onError);
+        return await _repo.GetAccountDTOByEmail(email);
     }
 
 }

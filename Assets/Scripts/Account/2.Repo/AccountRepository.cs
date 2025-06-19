@@ -2,6 +2,7 @@ using Firebase.Auth;
 using Firebase.Extensions;
 using Firebase.Firestore;
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class AccountRepository 
@@ -268,31 +269,17 @@ public class AccountRepository
         });
     }
 
-    public void GetAccountDTOByEmail(string email, Action<AccountDTO> onSuccess, Action<string> onError = null)
+    public async Task<AccountDTO> GetAccountDTOByEmail(string email)
     {
         if (DB == null)
         {
-            onError?.Invoke("Firestore가 초기화되지 않았습니다.");
             Debug.LogError("Firestore가 초기화되지 않았습니다.");
-            return;
+            return null;
         }
 
-        DB.Collection("UserDB").Document(email).GetSnapshotAsync().ContinueWithOnMainThread(task =>
+        try
         {
-            if (task.IsCanceled)
-            {
-                onError?.Invoke("유저 정보 조회 작업이 취소되었습니다.");
-                Debug.LogError("유저 정보 조회 작업이 취소되었습니다.");
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                onError?.Invoke($"유저 정보 조회 중 오류 발생: {task.Exception}");
-                Debug.LogError($"유저 정보 조회 중 오류 발생: {task.Exception}");
-                return;
-            }
-
-            var snapshot = task.Result;
+            var snapshot = await DB.Collection("UserDB").Document(email).GetSnapshotAsync();
             if (snapshot.Exists)
             {
                 var data = snapshot.ToDictionary();
@@ -300,15 +287,19 @@ public class AccountRepository
                 string nickname = data.ContainsKey("Nickname") ? data["Nickname"] as string : null;
                 string password = data.ContainsKey("Password") ? data["Password"] as string : null;
 
-                var dto = new AccountDTO(foundEmail, nickname, password);
-                onSuccess?.Invoke(dto);
+                return new AccountDTO(foundEmail, nickname, password);
             }
             else
             {
-                onError?.Invoke("해당 유저의 데이터가 UserDB에 존재하지 않습니다.");
                 Debug.LogWarning("해당 유저의 데이터가 UserDB에 존재하지 않습니다.");
+                return null;
             }
-        });
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"유저 정보 조회 중 오류 발생: {ex}");
+            return null;
+        }
     }
 
 
