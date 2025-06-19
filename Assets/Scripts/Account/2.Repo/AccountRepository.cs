@@ -6,18 +6,11 @@ using UnityEngine;
 
 public class AccountRepository 
 {
-    private Account _myAccount;
-    public Account MyAccount
-    {
-        get { return _myAccount; }
-        private set { _myAccount = value; }
-    }
-
     private FirebaseAuth Auth => FirebaseManager.Instance.Auth;
     private FirebaseFirestore DB => FirebaseManager.Instance.DB;
 
     // 로그인
-    public void SignIn(string email, string password, Action<Account> onSuccess = null, Action<string> onError = null)
+    public void SignIn(AccountDTO myAccountDto, string email, string password, Action<AccountDTO> onSuccess = null, Action<string> onError = null)
     {
         if (Auth == null)
         {
@@ -44,7 +37,6 @@ public class AccountRepository
             FirebaseUser newUser = task.Result.User;
             Debug.LogFormat("로그인 성공: {0} ({1})", newUser.DisplayName, newUser.UserId);
 
-            // Firestore에서 유저 데이터 가져오기 (이메일을 문서 ID로 사용)
             DB.Collection("UserDB").Document(email).GetSnapshotAsync().ContinueWithOnMainThread(snapshotTask =>
             {
                 if (snapshotTask.IsCanceled)
@@ -66,16 +58,16 @@ public class AccountRepository
                     var data = snapshot.ToDictionary();
                     if (data != null)
                     {
-                        // 각 필드를 안전하게 꺼내서 DTO에 할당
                         string email = data.ContainsKey("Email") ? data["Email"] as string : null;
                         string nickname = data.ContainsKey("Nickname") ? data["Nickname"] as string : null;
                         string password = data.ContainsKey("Password") ? data["Password"] as string : null;
 
                         var dto = new AccountDTO(email, nickname, password);
-                        var account = dto.ToDomain();
-                        _myAccount = account;
-                        Debug.Log($"MyAccount 할당 완료: {account.Email}, {account.Nickname}");
-                        onSuccess?.Invoke(account);
+                        myAccountDto.Email = dto.Email;
+                        myAccountDto.Nickname = dto.Nickname;
+                        myAccountDto.Password = dto.Password;
+                        Debug.Log($"MyAccount 할당 완료: {dto.Email}, {dto.Nickname}");
+                        onSuccess?.Invoke(dto);
                     }
                     else
                     {
@@ -92,8 +84,7 @@ public class AccountRepository
         });
     }
 
-
-    public void SignOut()
+    public void SignOut(AccountDTO myAccountDto)
     {
         if (Auth == null)
         {
@@ -101,9 +92,12 @@ public class AccountRepository
             return;
         }
         Auth.SignOut();
-        _myAccount = null; // 로그아웃 시 MyAccount를 null로 설정
+        myAccountDto.Email = null;
+        myAccountDto.Nickname = null;
+        myAccountDto.Password = null;
         Debug.Log("로그아웃 성공");
     }
+
 
     // 계정 생성(닉 없음)
     public void CreateAccount(string email, string password, Action<Account> onSuccess = null, Action<string> onError = null)
@@ -233,4 +227,89 @@ public class AccountRepository
             onSuccess?.Invoke();
         });
     }
+
+    public void ChangeNickname(AccountDTO myAccountDto, string newNickname, Action onSuccess = null, Action<string> onError = null)
+    {
+        if (myAccountDto == null || string.IsNullOrEmpty(myAccountDto.Email))
+        {
+            onError?.Invoke("로그인된 계정이 없습니다.");
+            Debug.LogError("로그인된 계정이 없습니다.");
+            return;
+        }
+
+        var nicknameSpec = new AccountNicknameSpecification();
+        if (!nicknameSpec.IsSatisfiedBy(newNickname))
+        {
+            string errorMsg = nicknameSpec.GetErrorMessage(newNickname);
+            onError?.Invoke(errorMsg);
+            Debug.LogError(errorMsg);
+            return;
+        }
+
+        var docRef = DB.Collection("UserDB").Document(myAccountDto.Email);
+        docRef.UpdateAsync("Nickname", newNickname).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCanceled)
+            {
+                onError?.Invoke("닉네임 변경 작업이 취소되었습니다.");
+                Debug.LogError("닉네임 변경 작업이 취소되었습니다.");
+                return;
+            }
+            if (task.IsFaulted)
+            {
+                onError?.Invoke($"닉네임 변경 중 오류 발생: {task.Exception}");
+                Debug.LogError($"닉네임 변경 중 오류 발생: {task.Exception}");
+                return;
+            }
+
+            myAccountDto.Nickname = newNickname;
+            Debug.Log("닉네임이 성공적으로 변경되었습니다.");
+            onSuccess?.Invoke();
+        });
+    }
+
+    public void GetAccountDTOByEmail(string email, Action<AccountDTO> onSuccess, Action<string> onError = null)
+    {
+        if (DB == null)
+        {
+            onError?.Invoke("Firestore가 초기화되지 않았습니다.");
+            Debug.LogError("Firestore가 초기화되지 않았습니다.");
+            return;
+        }
+
+        DB.Collection("UserDB").Document(email).GetSnapshotAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCanceled)
+            {
+                onError?.Invoke("유저 정보 조회 작업이 취소되었습니다.");
+                Debug.LogError("유저 정보 조회 작업이 취소되었습니다.");
+                return;
+            }
+            if (task.IsFaulted)
+            {
+                onError?.Invoke($"유저 정보 조회 중 오류 발생: {task.Exception}");
+                Debug.LogError($"유저 정보 조회 중 오류 발생: {task.Exception}");
+                return;
+            }
+
+            var snapshot = task.Result;
+            if (snapshot.Exists)
+            {
+                var data = snapshot.ToDictionary();
+                string foundEmail = data.ContainsKey("Email") ? data["Email"] as string : null;
+                string nickname = data.ContainsKey("Nickname") ? data["Nickname"] as string : null;
+                string password = data.ContainsKey("Password") ? data["Password"] as string : null;
+
+                var dto = new AccountDTO(foundEmail, nickname, password);
+                onSuccess?.Invoke(dto);
+            }
+            else
+            {
+                onError?.Invoke("해당 유저의 데이터가 UserDB에 존재하지 않습니다.");
+                Debug.LogWarning("해당 유저의 데이터가 UserDB에 존재하지 않습니다.");
+            }
+        });
+    }
+
+
 }
