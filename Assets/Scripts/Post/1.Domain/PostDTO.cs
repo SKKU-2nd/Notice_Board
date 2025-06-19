@@ -10,6 +10,8 @@ public class PostDTO
     public readonly List<string> LikeUserIDList;
     public readonly int CommentCount;
 
+    public int LikeCount => LikeUserIDList.Count;
+
     public PostDTO(string postId, string authorID, string content, DateTime createdAt, List<string> likeUserIDList, int commentCount)
     {
         PostId = postId;

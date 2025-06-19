@@ -63,9 +63,16 @@ public class Post
         Content = content;
     }
 
-    public bool CanDelete(string requesterId)
+    public Result CanDelete(string requesterId)
     {
-        return AuthorID == requesterId;
+        if (AuthorID == requesterId)
+        {
+            return new Result(true);
+        }
+        else
+        {
+            return new Result(false, "작성자가 아니면 삭제할 수 없습니다.");
+        }
     }
 
     // 좋아요 추가 / 삭제
