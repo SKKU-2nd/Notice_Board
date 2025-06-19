@@ -5,6 +5,8 @@ using UnityEngine;
 public class UI_PostList : MonoBehaviour
 {
     [SerializeField]
+    private UI_Post _postUI;
+    [SerializeField]
     private GameObject _postPreviewSlotPrefab;
     
     [Header("콘텐츠")]
@@ -33,6 +35,7 @@ public class UI_PostList : MonoBehaviour
             if (_postSlotList.Count <= i)
             {
                 var slot = Instantiate(_postPreviewSlotPrefab, _content).GetComponent<UI_PostListSlot>();
+                slot.PostShowButton.onClick.AddListener(() => ShowPost(slot.PostDTO));
                 _postSlotList.Add(slot);
             }
             _postSlotList[i].Refresh(postList[i]);
@@ -42,5 +45,12 @@ public class UI_PostList : MonoBehaviour
         {
             _postSlotList[i].gameObject.SetActive(false);
         }
+    }
+    
+    
+    private void ShowPost(PostDTO post)
+    {
+        _postUI.Active(post);
+        gameObject.SetActive(false);
     }
 }

@@ -6,11 +6,6 @@ using UnityEngine;
     {
         public TextMeshProUGUI ContentTextUI;
 
-        private void Start()
-        {
-            TextChanged();
-        }
-
         public void TextChanged()
         {
             string text = ContentTextUI.text;
