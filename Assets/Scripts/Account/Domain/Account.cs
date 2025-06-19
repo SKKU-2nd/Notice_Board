@@ -1,3 +1,4 @@
+using UnityEngine;
 public class Account 
 {
     public readonly string AccountID; //고유값
@@ -17,16 +18,23 @@ public class Account
         // 이메일 검증
         if (!emailSpec.IsSatisfiedBy(email))
         {
-            throw new System.ArgumentException(emailSpec.GetErrorMessage(email), nameof(email));
+            Debug.LogError(emailSpec.GetErrorMessage(email));
+            return;
         }
 
         // 닉네임 검증
         if (!nicknameSpec.IsSatisfiedBy(nickname))
-            throw new System.ArgumentException(nicknameSpec.GetErrorMessage(nickname), nameof(nickname));
+        {
+            Debug.LogError(nicknameSpec.GetErrorMessage(nickname));
+            return;
+        }
 
         // 비밀번호 검증
         if (!passwordSpec.IsSatisfiedBy(password))
-            throw new System.ArgumentException(passwordSpec.GetErrorMessage(password), nameof(password));
+        {
+            Debug.LogError(passwordSpec.GetErrorMessage(password));
+            return;
+        }
 
         Email = email;
         Nickname = nickname;

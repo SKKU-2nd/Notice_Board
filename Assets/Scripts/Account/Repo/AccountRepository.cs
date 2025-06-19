@@ -92,7 +92,7 @@ public class AccountRepository
         });
     }
 
-    // 계정 생성
+    // 계정 생성(닉 없음)
     public void CreateAccount(string email, string password, Action<Account> onSuccess = null, Action<string> onError = null)
     {
         if (Auth == null)
@@ -141,6 +141,53 @@ public class AccountRepository
             }
         });
     }
+
+    public void CreateAccount(string email, string nickname, string password, Action<Account> onSuccess = null, Action<string> onError = null)
+    {
+        if (Auth == null)
+        {
+            onError?.Invoke("Firebase 인증이 초기화되지 않았습니다.");
+            Debug.LogError("Firebase 인증이 초기화되지 않았습니다.");
+            return;
+        }
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(nickname))
+        {
+            onError?.Invoke("이메일, 닉네임 또는 비밀번호가 비어 있습니다.");
+            Debug.LogError("이메일, 닉네임 또는 비밀번호가 비어 있습니다.");
+            return;
+        }
+
+        Auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCanceled)
+            {
+                onError?.Invoke("계정 생성 작업이 취소되었습니다.");
+                Debug.LogError("계정 생성 작업이 취소되었습니다.");
+                return;
+            }
+            if (task.IsFaulted)
+            {
+                onError?.Invoke($"계정 생성 중 오류 발생: {task.Exception}");
+                Debug.LogError($"계정 생성 중 오류 발생: {task.Exception}");
+                return;
+            }
+
+            FirebaseUser newUser = task.Result.User;
+            Debug.LogFormat("계정 생성 성공: {0} ({1})", newUser.Email, newUser.UserId);
+
+            try
+            {
+                var account = new Account(email, nickname, password);
+                SaveAccountToUserDB(account, () => onSuccess?.Invoke(account), onError);
+            }
+            catch (Exception ex)
+            {
+                onError?.Invoke($"Account 객체 생성 또는 저장 중 오류: {ex}");
+                Debug.LogError($"Account 객체 생성 또는 저장 중 오류: {ex}");
+            }
+        });
+    }
+
 
     // Firestore에 계정 정보 저장
     public void SaveAccountToUserDB(Account account, Action onSuccess = null, Action<string> onError = null)
