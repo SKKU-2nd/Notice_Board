@@ -1,11 +1,9 @@
 public class Account 
 {
-    public readonly string Email;
+    public readonly string AccountID; //고유값
+    public readonly string Email; 
     public readonly string Nickname;
     public readonly string Password;
-
-    private static readonly string[] ForbiddenWords = { "바보", "멍청이" };
-
 
     public Account(string email, string nickname, string password)
     {
