@@ -31,6 +31,23 @@ public class Comment
         Content = content;
         CreatedAt = createdAt;
     }
+    
+    public Comment(CommentDTO dto)
+        : this(dto.CommentID, dto.AuthorID, dto.Content, dto.CreatedAt)
+    {
+    }
+    
+    public Result CanDelete(string requesterId)
+    {
+        if (AuthorID == requesterId)
+        {
+            return new Result(true);
+        }
+        else
+        {
+            return new Result(false, "작성자가 아니면 삭제할 수 없습니다.");
+        }
+    }
 
     public CommentDTO ToDto() => new CommentDTO(this);
 }

@@ -58,10 +58,17 @@ public class CommentManager : MonoSingleton<CommentManager>
         EnsureRepository();
 
         var commentDto = await _commentRepository.GetComment(postId, commentId);
+        var comment = new Comment(commentDto);
 
-        if (commentDto.AuthorID != requesterId)
-            throw new Exception("댓글 작성자가 아닌 사용자는 삭제할 수 없습니다.");
+        var result = comment.CanDelete(requesterId);
 
-        await _commentRepository.DeleteComment(postId, commentId);
+        if (result.IsSuccess)
+        {
+            await _commentRepository.DeleteComment(postId, commentId);
+        }
+        else
+        {
+            Debug.LogError(result.Message);
+        }
     }
 }
