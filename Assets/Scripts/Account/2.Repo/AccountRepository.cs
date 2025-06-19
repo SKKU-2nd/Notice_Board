@@ -186,13 +186,12 @@ public class AccountRepository
                 return;
             }
 
-            FirebaseUser newUser = task.Result.User;
-            Debug.LogFormat("계정 생성 성공: {0} ({1})", newUser.Email, newUser.UserId);
-
             try
             {
+                FirebaseUser newUser = task.Result.User;
                 var account = new Account(email, nickname, password);
                 SaveAccountToUserDB(account, () => onSuccess?.Invoke(account), onError);
+                Debug.LogFormat("계정 생성 성공: {0} ({1})", newUser.Email, newUser.UserId);
             }
             catch (Exception ex)
             {

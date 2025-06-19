@@ -2,6 +2,7 @@ using Firebase.Auth;
 using Firebase.Extensions;
 using Firebase.Firestore;
 using UnityEngine;
+using TMPro;
 
 public class AccountManager : MonoSingleton<AccountManager>
 {
@@ -27,11 +28,27 @@ public class AccountManager : MonoSingleton<AccountManager>
     public void Login()
     {
         _repo.SignIn(_email, _password,
-            account => {
+            account =>
+            {
                 MyAccount = account;
                 Debug.Log("로그인 및 MyAccount 할당 완료");
             },
-            error => {
+            error =>
+            {
+                Debug.LogError(error);
+            });
+    }
+
+    public void Login(string email, string password)
+    {
+        _repo.SignIn(email, password,
+            account =>
+            {
+                MyAccount = account;
+                Debug.Log("로그인 및 MyAccount 할당 완료");
+            },
+            error =>
+            {
                 Debug.LogError(error);
             });
     }
@@ -46,6 +63,21 @@ public class AccountManager : MonoSingleton<AccountManager>
                 Debug.LogError(error);
             });
     }
+
+    public void CreateAccount(string email, string password, string nickname)
+    {
+        _repo.CreateAccount(email, nickname, password,
+            account =>
+            {
+                MyAccount = account;
+                Debug.Log("계정 생성 및 MyAccount 할당 완료");
+            },
+            error =>
+            {
+                Debug.LogError(error);
+            });
+    }
+   
 
     public void SignOut()
     {
