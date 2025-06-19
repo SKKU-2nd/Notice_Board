@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
+    // TODO : 컨벤션 맞추기
     [Header("로그인용")]
     [SerializeField]
     private GameObject loginPanel;
@@ -32,6 +33,10 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Button createAccountCancelButton;
 
+    [Header("게시글 목록")]
+    [SerializeField]
+    private GameObject noticeBoardPreview;
+
     private void Awake()
     {
         loginButton.onClick.AddListener(OnLoginButtonClicked);
@@ -45,6 +50,7 @@ public class UIManager : MonoBehaviour
         string email = emailInputField.text;
         string password = passwordInputField.text;
         AccountManager.Instance.Login(email, password);
+        noticeBoardPreview.SetActive(true);
     }
 
     private void OnCreateAccountButtonClicked()

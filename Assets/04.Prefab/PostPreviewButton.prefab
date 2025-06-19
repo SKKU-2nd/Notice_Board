@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 87503263191300273}
   - component: {fileID: 6305031506782119838}
   - component: {fileID: 5520260736739114806}
-  - component: {fileID: 4204533010121676368}
   - component: {fileID: 4714959497807050382}
+  - component: {fileID: 7728223682527604930}
   m_Layer: 5
   m_Name: PostPreviewButton
   m_TagString: Untagged
@@ -40,7 +40,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 512, y: 0}
+  m_SizeDelta: {x: 512, y: 880.57}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &87503263191300273
 CanvasRenderer:
@@ -124,20 +124,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &4204533010121676368
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1555946791332973429}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalFit: 0
-  m_VerticalFit: 2
 --- !u!114 &4714959497807050382
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -160,10 +146,24 @@ MonoBehaviour:
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
+  m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &7728223682527604930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1555946791332973429}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79468893854e4516a771ad66f5295278, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _contentText: {fileID: 754176994823462525}
+  _informationText: {fileID: 8383635842071181816}
 --- !u!1 &5786081614551846674
 GameObject:
   m_ObjectHideFlags: 0
@@ -176,7 +176,6 @@ GameObject:
   - component: {fileID: 2521389537557605822}
   - component: {fileID: 754176994823462525}
   - component: {fileID: 1987337829300886666}
-  - component: {fileID: 6416543049494394167}
   m_Layer: 5
   m_Name: PostPreviewText
   m_TagString: Untagged
@@ -198,9 +197,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 6954685791161340668}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 35, y: -12}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 320, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &2521389537557605822
@@ -315,20 +314,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ContentTextUI: {fileID: 754176994823462525}
---- !u!114 &6416543049494394167
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5786081614551846674}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalFit: 0
-  m_VerticalFit: 2
 --- !u!1 &6185288780937682843
 GameObject:
   m_ObjectHideFlags: 0
@@ -340,7 +325,6 @@ GameObject:
   - component: {fileID: 5720033990147226903}
   - component: {fileID: 4949046167760504653}
   - component: {fileID: 8383635842071181816}
-  - component: {fileID: 1090951574854796232}
   m_Layer: 5
   m_Name: PostInformationText
   m_TagString: Untagged
@@ -362,9 +346,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 6954685791161340668}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 35, y: -850.8}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 320, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &4949046167760504653
@@ -466,17 +450,3 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &1090951574854796232
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6185288780937682843}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalFit: 0
-  m_VerticalFit: 2
