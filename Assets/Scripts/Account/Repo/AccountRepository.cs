@@ -17,7 +17,7 @@ public class AccountRepository
     private FirebaseFirestore DB => FirebaseManager.Instance.DB;
 
     // 로그인
-    public void Login(string email, string password, Action<Account> onSuccess = null, Action<string> onError = null)
+    public void SignIn(string email, string password, Action<Account> onSuccess = null, Action<string> onError = null)
     {
         if (Auth == null)
         {
@@ -63,11 +63,25 @@ public class AccountRepository
                 var snapshot = snapshotTask.Result;
                 if (snapshot.Exists)
                 {
-                    AccountDTO dto = snapshot.ConvertTo<AccountDTO>();
-                    var account = dto.ToDomain();
-                    _myAccount = account; // 로그인 성공 시 _myAccount에 할당
-                    Debug.Log($"MyAccount 할당 완료: {account.Email}, {account.Nickname}");
-                    onSuccess?.Invoke(account);
+                    var data = snapshot.ToDictionary();
+                    if (data != null)
+                    {
+                        // 각 필드를 안전하게 꺼내서 DTO에 할당
+                        string email = data.ContainsKey("Email") ? data["Email"] as string : null;
+                        string nickname = data.ContainsKey("Nickname") ? data["Nickname"] as string : null;
+                        string password = data.ContainsKey("Password") ? data["Password"] as string : null;
+
+                        var dto = new AccountDTO(email, nickname, password);
+                        var account = dto.ToDomain();
+                        _myAccount = account;
+                        Debug.Log($"MyAccount 할당 완료: {account.Email}, {account.Nickname}");
+                        onSuccess?.Invoke(account);
+                    }
+                    else
+                    {
+                        onError?.Invoke("UserDB에서 데이터를 불러오지 못했습니다.");
+                        Debug.LogWarning("UserDB에서 데이터를 불러오지 못했습니다.");
+                    }
                 }
                 else
                 {
@@ -78,7 +92,20 @@ public class AccountRepository
         });
     }
 
-    // 계정 생성
+
+    public void SignOut()
+    {
+        if (Auth == null)
+        {
+            Debug.LogError("Firebase 인증이 초기화되지 않았습니다.");
+            return;
+        }
+        Auth.SignOut();
+        _myAccount = null; // 로그아웃 시 MyAccount를 null로 설정
+        Debug.Log("로그아웃 성공");
+    }
+
+    // 계정 생성(닉 없음)
     public void CreateAccount(string email, string password, Action<Account> onSuccess = null, Action<string> onError = null)
     {
         if (Auth == null)
@@ -127,6 +154,54 @@ public class AccountRepository
             }
         });
     }
+
+    //계정 생성(닉 받음)
+    public void CreateAccount(string email, string nickname, string password, Action<Account> onSuccess = null, Action<string> onError = null)
+    {
+        if (Auth == null)
+        {
+            onError?.Invoke("Firebase 인증이 초기화되지 않았습니다.");
+            Debug.LogError("Firebase 인증이 초기화되지 않았습니다.");
+            return;
+        }
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(nickname))
+        {
+            onError?.Invoke("이메일, 닉네임 또는 비밀번호가 비어 있습니다.");
+            Debug.LogError("이메일, 닉네임 또는 비밀번호가 비어 있습니다.");
+            return;
+        }
+
+        Auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCanceled)
+            {
+                onError?.Invoke("계정 생성 작업이 취소되었습니다.");
+                Debug.LogError("계정 생성 작업이 취소되었습니다.");
+                return;
+            }
+            if (task.IsFaulted)
+            {
+                onError?.Invoke($"계정 생성 중 오류 발생: {task.Exception}");
+                Debug.LogError($"계정 생성 중 오류 발생: {task.Exception}");
+                return;
+            }
+
+            FirebaseUser newUser = task.Result.User;
+            Debug.LogFormat("계정 생성 성공: {0} ({1})", newUser.Email, newUser.UserId);
+
+            try
+            {
+                var account = new Account(email, nickname, password);
+                SaveAccountToUserDB(account, () => onSuccess?.Invoke(account), onError);
+            }
+            catch (Exception ex)
+            {
+                onError?.Invoke($"Account 객체 생성 또는 저장 중 오류: {ex}");
+                Debug.LogError($"Account 객체 생성 또는 저장 중 오류: {ex}");
+            }
+        });
+    }
+
 
     // Firestore에 계정 정보 저장
     public void SaveAccountToUserDB(Account account, Action onSuccess = null, Action<string> onError = null)
