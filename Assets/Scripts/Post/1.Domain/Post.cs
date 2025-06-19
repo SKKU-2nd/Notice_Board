@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 
-class Post
+public class Post
 {
     // 고유 값
     public readonly string PostId;   // 글의 고유 값 (파이어베이스 도큐먼트 key값)
     public readonly string AuthorID; // 글쓴이 이메일 (유저의 고유 ID)
 
     // 상태 값
-    public string Title { get; private set; }       // 제목
     public string Content { get; private set; }     // 글 내용
     public DateTime CreatedAt { get; private set; } // 작성 일자
     private HashSet<string> _likeUserIDList;        // 좋아요 누른 사람들 (유저의 고유 ID)
@@ -16,7 +15,7 @@ class Post
     public int CommentCount { get; private set; }   // 댓글 수 (게시판에서는 댓글 수만 보이기 때문에 따로 저장)
 
     // 생성자
-    public Post(string postId, string authorID, string title, string content, DateTime createdAt)
+    public Post(string postId, string authorID, string content, DateTime createdAt)
     {
         if (string.IsNullOrEmpty(postId))
         {
@@ -29,11 +28,6 @@ class Post
             throw new Exception("작성자 정보가 유효하지 않습니다.");
         }
 
-        if (string.IsNullOrEmpty(title))
-        {
-            throw new Exception("제목은 비워둘 수 없습니다.");
-        }
-
         if (string.IsNullOrEmpty(content))
         {
             throw new Exception("내용은 비워둘 수 없습니다.");
@@ -41,17 +35,16 @@ class Post
 
         PostId = postId;
         AuthorID = authorID;
-        Title = title;
         Content = content;
         CreatedAt = createdAt;
         _likeUserIDList = new HashSet<string>();
     }
 
     // 글 수정
-    public void Edit(string authorID, string title, string content)
+    public void Edit(string authorID, string content)
     {
         // 명세
-        if (string.IsNullOrWhiteSpace(authorID))
+        if (string.IsNullOrEmpty(authorID))
         {
             throw new Exception("유효하지 않은 사용자 ID입니다.");
         }
@@ -61,7 +54,6 @@ class Post
             throw new Exception("작성자가 아닌 사람은 게시글 수정을 할 수 없습니다.");
         }
 
-        Title = title;
         Content = content;
     }
 
@@ -89,5 +81,10 @@ class Post
         }
 
         CommentCount = commentCount;
+    }
+
+    public PostDto ToDto()
+    {
+        return new PostDto(this);
     }
 }
