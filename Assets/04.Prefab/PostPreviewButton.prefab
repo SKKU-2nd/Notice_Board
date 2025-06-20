@@ -616,6 +616,7 @@ MonoBehaviour:
   _postShowButtons:
   - {fileID: 7027256614952161261}
   - {fileID: 5520260736739114806}
+  _uiText: {fileID: 1987337829300886666}
 --- !u!114 &9201424671196737400
 MonoBehaviour:
   m_ObjectHideFlags: 0

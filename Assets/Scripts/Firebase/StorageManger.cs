@@ -26,8 +26,6 @@ public class StorageManger : MonoSingleton<StorageManger>
         OpenDialog.Filter = "JPEG files (*.jpg;*.jpeg)|*.jpg;*.jpeg|PNG files (*.png)|*.png|All files (*.*)|*.*";
         OpenDialog.FilterIndex = 3;
         OpenDialog.Title = "Image Dialog";
-
-        EnsureStorage();
     }
 
     private void EnsureStorage()

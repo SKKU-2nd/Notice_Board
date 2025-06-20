@@ -9,11 +9,6 @@ public class CommentManager : MonoSingleton<CommentManager>
 
     public event Action<PostDTO> OnDataChanged;
 
-    private void Start()
-    {
-        EnsureRepository();  // Start에서 Ensure 호출
-    }
-
     private void EnsureRepository()
     {
         if (_commentRepository == null)
