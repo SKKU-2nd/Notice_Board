@@ -2,15 +2,18 @@ using Firebase;
 using Firebase.Auth;
 using Firebase.Extensions;
 using Firebase.Firestore;
+using Firebase.Storage;
 using UnityEngine;
 
 public class FirebaseManager : MonoSingleton<FirebaseManager>
 {
     private FirebaseAuth _auth;
     private FirebaseFirestore _db;
+    private FirebaseStorage _storage;
 
     public FirebaseAuth Auth => _auth;
     public FirebaseFirestore DB => _db;
+    public FirebaseStorage Storage => _storage;
 
     protected override void Awake()
     {
@@ -24,6 +27,7 @@ public class FirebaseManager : MonoSingleton<FirebaseManager>
                 Debug.Log("Firebase dependencies are available.");
                 _auth = FirebaseAuth.DefaultInstance;
                 _db = FirebaseFirestore.DefaultInstance;
+                _storage= FirebaseStorage.DefaultInstance;
             }
             else
             {

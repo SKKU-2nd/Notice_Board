@@ -70,8 +70,9 @@ public class AccountRepository
                         string email = data.ContainsKey("Email") ? data["Email"] as string : null;
                         string nickname = data.ContainsKey("Nickname") ? data["Nickname"] as string : null;
                         string password = data.ContainsKey("Password") ? data["Password"] as string : null;
+                        string ProfilePath = data.ContainsKey("ProfilePath") ? data["ProfilePath"] as string : null;
 
-                        var dto = new AccountDTO(email, nickname, password);
+                        var dto = new AccountDTO(email, nickname, password, ProfilePath);
                         var account = dto.ToDomain();
                         _myAccount = account;
                         Debug.Log($"MyAccount 할당 완료: {account.Email}, {account.Nickname}");
