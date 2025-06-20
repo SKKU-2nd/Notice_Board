@@ -66,15 +66,6 @@ public class PostManager : MonoSingleton<PostManager>
         }
     }
 
-    public async Task<bool> IsLiked(string postId, string userId)
-    {
-        EnsureRepository();
-
-        var postDto = await _postRepository.GetPost(postId);
-        var post = new Post(postDto);
-        return post.IsLiked(userId);
-    }
-
     public async Task ToggleLike(string postId, string userId)
     {
         EnsureRepository();

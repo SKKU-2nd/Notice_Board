@@ -83,8 +83,8 @@ public class PostTestEditor : EditorWindow
         {
             RunAsync(async () => {
                 await PostManager.Instance.ToggleLike(targetPostId, authorId);
-                var isLiked = await PostManager.Instance.IsLiked(targetPostId, authorId);
-                Debug.Log(isLiked ? "좋아요 추가됨" : "좋아요 제거됨");
+                var postDto = await PostManager.Instance.GetPost(targetPostId);
+                Debug.Log(postDto.IsLiked(AccountManager.Instance.MyAccount.Email) ? "좋아요 추가됨" : "좋아요 제거됨");
             });
         }
 
