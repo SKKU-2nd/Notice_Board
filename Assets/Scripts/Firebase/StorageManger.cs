@@ -3,27 +3,94 @@ using System.IO;
 using System.Windows.Forms;
 using UnityEngine.UI;
 using Firebase.Storage;
+using System;
+using System.Collections;
+using System.Threading.Tasks;
+using UnityEngine.Networking;
 
-public class StorageMaanger : MonoBehaviour
+public class StorageManger : MonoSingleton<StorageManger>
 {
+    private FirebaseStorage _storage;
+        
     private OpenFileDialog OpenDialog;
     private Stream openStream = null;
-    private FirebaseStorage storage; 
     private StorageReference storageRef;
 
-    private void Awake()
+    protected override void Awake()
+    {
+        base.Awake();
+        Init();
+    }
+
+    private void Init()
     {
         OpenDialog = new OpenFileDialog();
         OpenDialog.Filter = "jpg files (*.jpg) |*.jpg|png files (*.png) |*.jpg|All files  (*.*)|*.*";
         OpenDialog.FilterIndex = 3;
         OpenDialog.Title = "Image Dialog";
 
-        storage = FirebaseStorage.DefaultInstance; 
-        storageRef = storage.GetReferenceFromUrl("gs://noticeboard-60361.firebasestorage.app");
+        storageRef = _storage.GetReferenceFromUrl("gs://noticeboard-60361.firebasestorage.app");
+        EnsureStorage();
     }
 
+    public async void LoadImageToUI(string imagePath, Image targetImage)
+    {
+        Uri downloadUri = await GetDownloadUrl(imagePath);
+        if (downloadUri == null)
+        {
+            Debug.LogError("Download URL is null");
+            return;
+        }
 
+        StartCoroutine(LoadImageCoroutine(downloadUri, sprite => {
+            if (targetImage != null)
+                targetImage.sprite = sprite;
+        }));
+    }
 
+    private async Task<Uri> GetDownloadUrl(string imagePath)
+    {
+        try
+        {
+            EnsureStorage();
+            return await _storage.GetReference(imagePath).GetDownloadUrlAsync();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"GetDownloadUrl 실패: {e.Message}");
+            return null;
+        }
+    }
+
+    private IEnumerator LoadImageCoroutine(Uri uri, Action<Sprite> onSuccess)
+    {
+        using var request = UnityWebRequestTexture.GetTexture(uri);
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError($"이미지 다운로드 실패: {request.error}");
+            yield break;
+        }
+
+        Texture2D texture = DownloadHandlerTexture.GetContent(request);
+        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
+
+        onSuccess?.Invoke(sprite);
+    }
+    
+    private void EnsureStorage()
+    {
+        if (_storage == null)
+        {
+            if (FirebaseManager.Instance?.Storage == null)
+                throw new Exception("Firebase Storage 인스턴스가 null이므로 Storage를 사용할 수 없습니다.");
+
+            _storage = FirebaseManager.Instance.Storage;
+        }
+    }
+
+    // 업로드 파일 선택
     public string FileOpen()
     {
         if (OpenDialog.ShowDialog() == DialogResult.OK)
@@ -38,7 +105,7 @@ public class StorageMaanger : MonoBehaviour
     }
 
     // 나중에 어디이미지가 변할지 코드에 적용해야함  
-    public void OnClickImage()
+    public void SetImage()
     {
         string fileName = FileOpen();
         if (!string.IsNullOrEmpty(fileName))
@@ -58,21 +125,9 @@ public class StorageMaanger : MonoBehaviour
                         new Rect(0, 0, tex.width, tex.height),
                         new Vector2(0.5f, 0.5f)
                     );
-                    GetComponent<Image>().sprite = sprite;
+                    // 적용할 Image에 Sprite적용
+                    // GetComponent<Image>().sprite = sprite;
                 }
-            }
-        }
-    }
-
-
-    private void OnGUI()
-    {
-        if (GUI.Button(new Rect(100, 100, 300, 200), "ImageSet"))
-        {
-            string fileName = FileOpen();
-            if (!string.IsNullOrEmpty(fileName))
-            {
-                UploadImage(fileName);
             }
         }
     }
