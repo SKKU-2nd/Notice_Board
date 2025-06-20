@@ -140,7 +140,8 @@ public class AccountRepository
             try
             {
                 var account = new Account(email, nickname, password);
-                SaveAccountToUserDB(account, () => onSuccess?.Invoke(account), onError);
+                SaveAccountToUserDB(account.ToDTO(), () => onSuccess?.Invoke(account), onError);
+
             }
             catch (Exception ex)
             {
@@ -151,7 +152,7 @@ public class AccountRepository
     }
 
     //계정 생성(닉 받음)
-    public void CreateAccount(string email, string nickname, string password, Action<Account> onSuccess = null, Action<string> onError = null)
+    public void CreateAccount(string email, string nickname, string password, Action<AccountDTO> onSuccess = null, Action<string> onError = null)
     {
         if (Auth == null)
         {
@@ -185,7 +186,7 @@ public class AccountRepository
             {
                 FirebaseUser newUser = task.Result.User;
                 var account = new Account(email, nickname, password);
-                SaveAccountToUserDB(account, () => onSuccess?.Invoke(account), onError);
+                SaveAccountToUserDB(account.ToDTO(), () => onSuccess?.Invoke(account.ToDTO()), onError);
                 Debug.LogFormat("계정 생성 성공: {0} ({1})", newUser.Email, newUser.UserId);
             }
             catch (Exception ex)
@@ -198,7 +199,7 @@ public class AccountRepository
 
 
     // Firestore에 계정 정보 저장
-    public void SaveAccountToUserDB(Account account, Action onSuccess = null, Action<string> onError = null)
+    public void SaveAccountToUserDB(AccountDTO account, Action onSuccess = null, Action<string> onError = null)
     {
         if (DB == null)
         {
@@ -207,9 +208,7 @@ public class AccountRepository
             return;
         }
 
-        var dto = account.ToDTO();
-
-        DB.Collection("UserDB").Document(dto.Email).SetAsync(dto)
+        DB.Collection("UserDB").Document(account.Email).SetAsync(account)
             .ContinueWithOnMainThread(task =>
         {
             if (task.IsCanceled)

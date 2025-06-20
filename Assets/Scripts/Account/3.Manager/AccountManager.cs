@@ -62,16 +62,17 @@ public class AccountManager : MonoSingleton<AccountManager>
     public void CreateAccount(string email, string password, string nickname)
     {
         _repo.CreateAccount(email, nickname, password,
-            account =>
+            dto =>
             {
-                MyAccount = account;
-                Debug.Log("계정 생성 및 MyAccount 할당 완료");
+                MyAccountDto = dto;
+                Debug.Log("계정 생성 및 MyAccountDto 할당 완료");
             },
             error =>
             {
                 Debug.LogError(error);
             });
     }
+
 
 
     public void SignOut()
