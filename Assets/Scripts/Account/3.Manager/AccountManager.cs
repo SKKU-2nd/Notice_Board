@@ -74,4 +74,23 @@ public class AccountManager : MonoSingleton<AccountManager>
         _repo.SignOut(MyAccount);
         Debug.Log("로그아웃 및 MyAccount 초기화 완료");
     }
+
+    public async Task<AccountDTO> GetAccountDTOByEmailAsync(string email)
+    {
+        try
+        {
+            var dto = await _repo.GetAccountDTOByEmail(email);
+            if (dto == null)
+            {
+                Debug.LogWarning("해당 이메일의 계정 정보를 찾을 수 없습니다.");
+            }
+            return dto;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"계정 정보 조회 실패: {ex.Message}");
+            return null;
+        }
+    }
+
 }
