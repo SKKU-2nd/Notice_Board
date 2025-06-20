@@ -7,6 +7,8 @@ public class CommentManager : MonoSingleton<CommentManager>
 {
     private CommentRepository _commentRepository;
 
+    public event Action<PostDTO> OnDataChanged;
+
     private void Start()
     {
         EnsureRepository();  // Start에서 Ensure 호출
@@ -34,6 +36,9 @@ public class CommentManager : MonoSingleton<CommentManager>
         string commentId = _commentRepository.GenerateNewCommentId(postId);
         var comment = new Comment(commentId, authorId, content, DateTime.UtcNow);
         await _commentRepository.AddComment(postId, comment.ToDto());
+
+        var postDto = await PostManager.Instance.GetPost(postId);
+        OnDataChanged?.Invoke(postDto);
 
         await PostManager.Instance.IncrementCommentCount(postId);
     }

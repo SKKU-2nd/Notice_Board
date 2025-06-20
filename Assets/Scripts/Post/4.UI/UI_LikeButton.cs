@@ -6,8 +6,10 @@ public class UI_LikeButton : MonoBehaviour
 {
     [SerializeField]
     private Sprite _likeOnSprite;
+
     [SerializeField]
     private Sprite _likeOffSprite;
+
     [SerializeField]
     private Image _heartImage;
 
@@ -15,19 +17,27 @@ public class UI_LikeButton : MonoBehaviour
 
     private string _postId;
 
-    public string PostId { get => _postId; set => _postId = value; }
+    public string PostId
+    {
+        get => _postId;
+        set
+        {
+            _postId = value;
+            Init();
+        }
+    }
 
     private void Awake()
     {
         _button = GetComponent<Button>();
 
         _button.onClick.AddListener(ToggleLike);
-        Init();
     }
 
     private async void Init()
     {
-        // _heartImage.sprite = result ? _likeOnSprite : _likeOffSprite;
+        var result = await PostManager.Instance.IsLiked(PostId, AccountManager.Instance.MyAccount.Email);
+        _heartImage.sprite = result ? _likeOnSprite : _likeOffSprite;
     }
 
     private async void ToggleLike()

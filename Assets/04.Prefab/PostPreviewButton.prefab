@@ -613,6 +613,9 @@ MonoBehaviour:
   _contentText: {fileID: 754176994823462525}
   _informationText: {fileID: 8383635842071181816}
   _likeButton: {fileID: 2558056289172467773}
+  _postShowButtons:
+  - {fileID: 7027256614952161261}
+  - {fileID: 5520260736739114806}
 --- !u!114 &9201424671196737400
 MonoBehaviour:
   m_ObjectHideFlags: 0

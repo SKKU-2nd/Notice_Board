@@ -11,7 +11,7 @@ public class UI_Post : MonoBehaviour
     [SerializeField]
     private Transform _contentContainer;
     [SerializeField]
-    private UI_Comment _commentPrefab;
+    private UI_CommentSlot _commentSlotPrefab;
     [SerializeField]
     private TextMeshProUGUI _contentText;
     [SerializeField]
@@ -22,8 +22,12 @@ public class UI_Post : MonoBehaviour
     private List<Button> _backButton;
     [SerializeField]
     private GameObject _backUI;
+
+    private UI_WriteComment _writeComment;
     
-    private List<UI_Comment> _commentList = new List<UI_Comment>();
+    private List<UI_CommentSlot> _commentList = new List<UI_CommentSlot>();
+    
+    private string _currentPostID;
 
     private void Awake()
     {
@@ -31,12 +35,17 @@ public class UI_Post : MonoBehaviour
         {
             button.onClick.AddListener(GoBack);
         }
+
+        _writeComment = GetComponent<UI_WriteComment>();
+
+        CommentManager.Instance.OnDataChanged += Refresh;
     }
 
     // 스프라이트 추가
-    public async void Active(PostDTO postDto)
+    public async void Refresh(PostDTO postDto)
     {
         gameObject.SetActive(true);
+        _writeComment.PostID = postDto.PostId;
         _contentText.text = postDto.Content;
         // 유저 정보 가져와서 넣기
         // var user = AccountManager.Instance.GetAccountDTO(AuthorID);
@@ -50,7 +59,7 @@ public class UI_Post : MonoBehaviour
         {
             if (_commentList.Count <= i)
             {
-                var slot = Instantiate(_commentPrefab, _contentContainer).GetComponent<UI_Comment>();
+                var slot = Instantiate(_commentSlotPrefab, _contentContainer).GetComponent<UI_CommentSlot>();
                 _commentList.Add(slot);
             }
             _commentList[i].Refresh(commentList[i]);

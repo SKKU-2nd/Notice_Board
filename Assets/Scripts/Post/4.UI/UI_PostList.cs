@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UI_PostList : MonoBehaviour
 {
@@ -35,7 +36,10 @@ public class UI_PostList : MonoBehaviour
             if (_postSlotList.Count <= i)
             {
                 var slot = Instantiate(_postPreviewSlotPrefab, _content).GetComponent<UI_PostListSlot>();
-                slot.PostShowButton.onClick.AddListener(() => ShowPost(slot.PostDTO));
+                foreach (var showButtons in slot.PostShowButtons)
+                {
+                    showButtons.onClick.AddListener(() => ShowPost(slot.PostDTO));
+                }
                 _postSlotList.Add(slot);
             }
             _postSlotList[i].Refresh(postList[i]);
@@ -50,7 +54,7 @@ public class UI_PostList : MonoBehaviour
     
     private void ShowPost(PostDTO post)
     {
-        _postUI.Active(post);
+        _postUI.Refresh(post);
         gameObject.SetActive(false);
     }
 }

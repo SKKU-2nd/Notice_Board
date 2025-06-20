@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UI_Comment : MonoBehaviour
+public class UI_CommentSlot : MonoBehaviour
 {
     [SerializeField]
     private TextMeshProUGUI _commentText;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,18 +18,19 @@ public class UI_PostListSlot : MonoBehaviour
     private TextMeshProUGUI _informationText;
     [SerializeField]
     private UI_LikeButton _likeButton;
+    [SerializeField]
+    private List<Button> _postShowButtons;
+    public List<Button> PostShowButtons => _postShowButtons;
     
     private PostDTO _postDTO;
     public PostDTO PostDTO => _postDTO;
     
-    private Button _postShowButton;
-    public Button PostShowButton => _postShowButton;
-    
     private UI_Text _uiText;
+
+    public event Action<PostDTO> PostShow;
 
     private void Awake()
     {
-        _postShowButton = GetComponent<Button>();
         _uiText = GetComponentInChildren<UI_Text>();
     }
 

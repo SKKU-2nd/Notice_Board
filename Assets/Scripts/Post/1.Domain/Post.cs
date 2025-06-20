@@ -12,10 +12,11 @@ public class Post
     public DateTime CreatedAt { get; private set; } // 작성 일자
     private List<string> _likeUserIDList;           // 좋아요 누른 사람들 (유저의 고유 ID)
     public List<string> LikeUserIDList => _likeUserIDList;
-    public int CommentCount { get; private set; }   // 댓글 수 (게시판에서는 댓글 수만 보이기 때문에 따로 저장)
+    public int CommentCount { get; private set; } // 댓글 수 (게시판에서는 댓글 수만 보이기 때문에 따로 저장)
 
     // 생성자
-    public Post(string postId, string authorID, string content, DateTime createdAt, List<string> likeUserIDList, int commentCount)
+    public Post(string postId, string authorID, string content, DateTime createdAt, List<string> likeUserIDList,
+        int commentCount)
     {
         if (string.IsNullOrEmpty(postId))
             throw new Exception("포스트 아이디가 유효하지 않습니다.");
@@ -28,7 +29,7 @@ public class Post
 
         if (commentCount < 0)
             throw new Exception("댓글 수는 음수일 수 없습니다.");
-        
+
         if (likeUserIDList == null)
             throw new Exception("좋아요 리스트는 NULL일 수 없습니다.");
 
@@ -39,7 +40,7 @@ public class Post
         CommentCount = commentCount;
         _likeUserIDList = likeUserIDList;
     }
-    
+
     public Post(PostDTO dto)
         : this(dto.PostId, dto.AuthorID, dto.Content, dto.CreatedAt, dto.LikeUserIDList, dto.CommentCount)
     {
@@ -72,6 +73,16 @@ public class Post
         {
             return new Result(false, "작성자가 아니면 삭제할 수 없습니다.");
         }
+    }
+
+    public bool IsLiked(string requesterId)
+    {
+        if (string.IsNullOrWhiteSpace(requesterId))
+        {
+            throw new Exception("유효하지 않은 사용자 ID입니다.");
+        }
+        
+        return _likeUserIDList.Contains(requesterId);
     }
 
     // 좋아요 추가 / 삭제
