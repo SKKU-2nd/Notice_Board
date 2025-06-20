@@ -43,7 +43,7 @@ public class FirebaseManagerEditor : EditorWindow
                 emailField.SetValue(manager, loginEmail);
                 passwordField.SetValue(manager, loginPassword);
 
-                manager.Login();
+                manager.Login(loginEmail, loginPassword);
                 Debug.Log("로그인 시도 완료");
             }
             else
