@@ -71,4 +71,21 @@ public class CommentManager : MonoSingleton<CommentManager>
             Debug.LogError(result.Message);
         }
     }
+    
+    public async Task DeleteAllComments(string postId, string requesterId)
+    {
+        EnsureRepository();
+
+        var comments = await _commentRepository.GetComments(postId);
+
+        foreach (var commentDto in comments)
+        {
+            var comment = new Comment(commentDto);
+            
+            await _commentRepository.DeleteComment(postId, comment.CommentID);
+        }
+
+        // PostManager 쪽 CommentCount를 0으로 초기화하려면 아래 줄도 추가할 수 있음
+        await PostManager.Instance.ResetCommentCount(postId);  // 이 함수가 있다면
+    }
 }

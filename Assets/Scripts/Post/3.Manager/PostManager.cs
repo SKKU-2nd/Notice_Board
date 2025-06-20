@@ -59,6 +59,7 @@ public class PostManager : MonoSingleton<PostManager>
         if (result.IsSuccess)
         {
             await _postRepository.DeletePost(postId);
+            await CommentManager.Instance.DeleteAllComments(postId, requesterId);
         }
         else
         {
@@ -87,6 +88,17 @@ public class PostManager : MonoSingleton<PostManager>
         var post = new Post(postDto);
 
         post.SetCommentCount(postDto.CommentCount + 1);
+        await _postRepository.UpdatePost(post.ToDto());
+    }
+
+    public async Task ResetCommentCount(string postId)
+    {
+        EnsureRepository();
+        
+        var postDto = await _postRepository.GetPost(postId);
+        var post = new Post(postDto);
+
+        post.SetCommentCount(0);
         await _postRepository.UpdatePost(post.ToDto());
     }
 

@@ -693,10 +693,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: NoticeBoardCanvas
       objectReference: {fileID: 0}
-    - target: {fileID: 6220685948699752960, guid: bd7cca7a0a638db43874d831f31d0c68, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: 1e66d62a04c3e8040a85d5c0ae35e66e, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
