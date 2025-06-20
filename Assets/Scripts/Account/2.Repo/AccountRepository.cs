@@ -5,93 +5,46 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class AccountRepository 
+public class AccountRepository
 {
     private FirebaseAuth Auth => FirebaseManager.Instance.Auth;
     private FirebaseFirestore DB => FirebaseManager.Instance.DB;
 
     // 로그인
-    public void SignIn(AccountDTO myAccountDto, string email, string password, Action<AccountDTO> onSuccess = null, Action<string> onError = null)
+    public async Task<AccountDTO> SignInAsync(AccountDTO myAccountDto, string email, string password)
     {
         if (Auth == null)
-        {
-            onError?.Invoke("Firebase 인증이 초기화되지 않았습니다.");
-            Debug.LogError("Firebase 인증이 초기화되지 않았습니다.");
-            return;
-        }
+            throw new InvalidOperationException("Firebase 인증이 초기화되지 않았습니다.");
 
-        Auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
-        {
-            if (task.IsCanceled)
-            {
-                onError?.Invoke("이메일/비밀번호 로그인 작업이 취소되었습니다.");
-                Debug.LogError("이메일/비밀번호 로그인 작업이 취소되었습니다.");
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                onError?.Invoke($"이메일/비밀번호 로그인 중 오류 발생: {task.Exception}");
-                Debug.LogError($"이메일/비밀번호 로그인 중 오류 발생: {task.Exception}");
-                return;
-            }
+        var authResult = await Auth.SignInWithEmailAndPasswordAsync(email, password);
+        FirebaseUser newUser = authResult.User;
+        Debug.LogFormat("로그인 성공: {0} ({1})", newUser.DisplayName, newUser.UserId);
 
-            FirebaseUser newUser = task.Result.User;
-            Debug.LogFormat("로그인 성공: {0} ({1})", newUser.DisplayName, newUser.UserId);
+        var snapshot = await DB.Collection("UserDB").Document(email).GetSnapshotAsync();
+        if (!snapshot.Exists)
+            throw new Exception("해당 유저의 데이터가 UserDB에 존재하지 않습니다.");
 
-            DB.Collection("UserDB").Document(email).GetSnapshotAsync().ContinueWithOnMainThread(snapshotTask =>
-            {
-                if (snapshotTask.IsCanceled)
-                {
-                    onError?.Invoke("유저 정보 조회 작업이 취소되었습니다.");
-                    Debug.LogError("유저 정보 조회 작업이 취소되었습니다.");
-                    return;
-                }
-                if (snapshotTask.IsFaulted)
-                {
-                    onError?.Invoke($"유저 정보 조회 중 오류 발생: {snapshotTask.Exception}");
-                    Debug.LogError($"유저 정보 조회 중 오류 발생: {snapshotTask.Exception}");
-                    return;
-                }
+        var data = snapshot.ToDictionary();
+        if (data == null)
+            throw new Exception("UserDB에서 데이터를 불러오지 못했습니다.");
 
-                var snapshot = snapshotTask.Result;
-                if (snapshot.Exists)
-                {
-                    var data = snapshot.ToDictionary();
-                    if (data != null)
-                    {
-                        string email = data.ContainsKey("Email") ? data["Email"] as string : null;
-                        string nickname = data.ContainsKey("Nickname") ? data["Nickname"] as string : null;
-                        string password = data.ContainsKey("Password") ? data["Password"] as string : null;
+        string foundEmail = data.ContainsKey("Email") ? data["Email"] as string : null;
+        string nickname = data.ContainsKey("Nickname") ? data["Nickname"] as string : null;
+        string foundPassword = data.ContainsKey("Password") ? data["Password"] as string : null;
 
-                        var dto = new AccountDTO(email, nickname, password);
-                        myAccountDto.Email = dto.Email;
-                        myAccountDto.Nickname = dto.Nickname;
-                        myAccountDto.Password = dto.Password;
-                        Debug.Log($"MyAccount 할당 완료: {dto.Email}, {dto.Nickname}");
-                        onSuccess?.Invoke(dto);
-                    }
-                    else
-                    {
-                        onError?.Invoke("UserDB에서 데이터를 불러오지 못했습니다.");
-                        Debug.LogWarning("UserDB에서 데이터를 불러오지 못했습니다.");
-                    }
-                }
-                else
-                {
-                    onError?.Invoke("해당 유저의 데이터가 UserDB에 존재하지 않습니다.");
-                    Debug.LogWarning("해당 유저의 데이터가 UserDB에 존재하지 않습니다.");
-                }
-            });
-        });
+        var dto = new AccountDTO(foundEmail, nickname, foundPassword);
+        myAccountDto.Email = dto.Email;
+        myAccountDto.Nickname = dto.Nickname;
+        myAccountDto.Password = dto.Password;
+        Debug.Log($"MyAccount 할당 완료: {dto.Email}, {dto.Nickname}");
+        return dto;
     }
 
     public void SignOut(AccountDTO myAccountDto)
     {
         if (Auth == null)
-        {
-            Debug.LogError("Firebase 인증이 초기화되지 않았습니다.");
-            return;
-        }
+            throw new InvalidOperationException("Firebase 인증이 초기화되지 않았습니다.");
+
         Auth.SignOut();
         myAccountDto.Email = null;
         myAccountDto.Nickname = null;
@@ -99,204 +52,87 @@ public class AccountRepository
         Debug.Log("로그아웃 성공");
     }
 
-
     // 계정 생성(닉 없음)
-    public void CreateAccount(string email, string password, Action<Account> onSuccess = null, Action<string> onError = null)
+    public async Task<Account> CreateAccountAsync(string email, string password)
     {
         if (Auth == null)
-        {
-            onError?.Invoke("Firebase 인증이 초기화되지 않았습니다.");
-            Debug.LogError("Firebase 인증이 초기화되지 않았습니다.");
-            return;
-        }
+            throw new InvalidOperationException("Firebase 인증이 초기화되지 않았습니다.");
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
-        {
-            onError?.Invoke("이메일 또는 비밀번호가 비어 있습니다.");
-            Debug.LogError("이메일 또는 비밀번호가 비어 있습니다.");
-            return;
-        }
+            throw new ArgumentException("이메일 또는 비밀번호가 비어 있습니다.");
 
-        //여기가 변해야함
         string nickname = email.Split('@')[0];
+        var authResult = await Auth.CreateUserWithEmailAndPasswordAsync(email, password);
+        FirebaseUser newUser = authResult.User;
+        Debug.LogFormat("계정 생성 성공: {0} ({1})", newUser.Email, newUser.UserId);
 
-        Auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
-        {
-            if (task.IsCanceled)
-            {
-                onError?.Invoke("계정 생성 작업이 취소되었습니다.");
-                Debug.LogError("계정 생성 작업이 취소되었습니다.");
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                onError?.Invoke($"계정 생성 중 오류 발생: {task.Exception}");
-                Debug.LogError($"계정 생성 중 오류 발생: {task.Exception}");
-                return;
-            }
-
-            FirebaseUser newUser = task.Result.User;
-            Debug.LogFormat("계정 생성 성공: {0} ({1})", newUser.Email, newUser.UserId);
-
-            try
-            {
-                var account = new Account(email, nickname, password);
-                SaveAccountToUserDB(account.ToDTO(), () => onSuccess?.Invoke(account), onError);
-
-            }
-            catch (Exception ex)
-            {
-                onError?.Invoke($"Account 객체 생성 또는 저장 중 오류: {ex}");
-                Debug.LogError($"Account 객체 생성 또는 저장 중 오류: {ex}");
-            }
-        });
+        var account = new Account(email, nickname, password);
+        await SaveAccountToUserDBAsync(account.ToDTO());
+        return account;
     }
 
-    //계정 생성(닉 받음)
-    public void CreateAccount(string email, string nickname, string password, Action<AccountDTO> onSuccess = null, Action<string> onError = null)
+    // 계정 생성(닉 받음)
+    public async Task<AccountDTO> CreateAccountAsync(string email, string nickname, string password)
     {
         if (Auth == null)
-        {
-            onError?.Invoke("Firebase 인증이 초기화되지 않았습니다.");
-            Debug.LogError("Firebase 인증이 초기화되지 않았습니다.");
-            return;
-        }
+            throw new InvalidOperationException("Firebase 인증이 초기화되지 않았습니다.");
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(nickname))
-        {
-            onError?.Invoke("이메일, 닉네임 또는 비밀번호가 비어 있습니다.");
-            Debug.LogError("이메일, 닉네임 또는 비밀번호가 비어 있습니다.");
-            return;
-        }
+            throw new ArgumentException("이메일, 닉네임 또는 비밀번호가 비어 있습니다.");
 
-        Auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
-        {
-            if (task.IsCanceled)
-            {
-                onError?.Invoke("계정 생성 작업이 취소되었습니다.");
-                Debug.LogError("계정 생성 작업이 취소되었습니다.");
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                onError?.Invoke($"계정 생성 중 오류 발생: {task.Exception}");
-                Debug.LogError($"계정 생성 중 오류 발생: {task.Exception}");
-                return;
-            }
+        var authResult = await Auth.CreateUserWithEmailAndPasswordAsync(email, password);
+        FirebaseUser newUser = authResult.User;
+        Debug.LogFormat("계정 생성 성공: {0} ({1})", newUser.Email, newUser.UserId);
 
-            try
-            {
-                FirebaseUser newUser = task.Result.User;
-                var account = new Account(email, nickname, password);
-                SaveAccountToUserDB(account.ToDTO(), () => onSuccess?.Invoke(account.ToDTO()), onError);
-                Debug.LogFormat("계정 생성 성공: {0} ({1})", newUser.Email, newUser.UserId);
-            }
-            catch (Exception ex)
-            {
-                onError?.Invoke($"Account 객체 생성 또는 저장 중 오류: {ex}");
-                Debug.LogError($"Account 객체 생성 또는 저장 중 오류: {ex}");
-            }
-        });
+        var account = new Account(email, nickname, password);
+        var dto = account.ToDTO();
+        await SaveAccountToUserDBAsync(dto);
+        return dto;
     }
-
 
     // Firestore에 계정 정보 저장
-    public void SaveAccountToUserDB(AccountDTO account, Action onSuccess = null, Action<string> onError = null)
+    public async Task SaveAccountToUserDBAsync(AccountDTO account)
     {
         if (DB == null)
-        {
-            onError?.Invoke("Firestore가 초기화되지 않았습니다.");
-            Debug.LogError("Firestore가 초기화되지 않았습니다.");
-            return;
-        }
+            throw new InvalidOperationException("Firestore가 초기화되지 않았습니다.");
 
-        DB.Collection("UserDB").Document(account.Email).SetAsync(account)
-            .ContinueWithOnMainThread(task =>
-        {
-            if (task.IsCanceled)
-            {
-                onError?.Invoke("계정 정보 저장 작업이 취소되었습니다.");
-                Debug.LogError("계정 정보 저장 작업이 취소되었습니다.");
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                onError?.Invoke($"계정 정보 저장 중 오류 발생: {task.Exception}");
-                Debug.LogError($"계정 정보 저장 중 오류 발생: {task.Exception}");
-                return;
-            }
-            Debug.Log("계정 정보가 UserDB(Firestore)에 저장되었습니다.");
-            onSuccess?.Invoke();
-        });
+        await DB.Collection("UserDB").Document(account.Email).SetAsync(account);
+        Debug.Log("계정 정보가 UserDB(Firestore)에 저장되었습니다.");
     }
 
-    public void ChangeNickname(AccountDTO myAccountDto, string newNickname, Action onSuccess = null, Action<string> onError = null)
+    // 닉네임 변경
+    public async Task ChangeNicknameAsync(AccountDTO myAccountDto, string newNickname)
     {
         if (myAccountDto == null || string.IsNullOrEmpty(myAccountDto.Email))
-        {
-            onError?.Invoke("로그인된 계정이 없습니다.");
-            Debug.LogError("로그인된 계정이 없습니다.");
-            return;
-        }
+            throw new InvalidOperationException("로그인된 계정이 없습니다.");
 
         var nicknameSpec = new AccountNicknameSpecification();
         if (!nicknameSpec.IsSatisfiedBy(newNickname))
-        {
-            string errorMsg = nicknameSpec.GetErrorMessage(newNickname);
-            onError?.Invoke(errorMsg);
-            Debug.LogError(errorMsg);
-            return;
-        }
+            throw new ArgumentException(nicknameSpec.GetErrorMessage(newNickname));
 
         var docRef = DB.Collection("UserDB").Document(myAccountDto.Email);
-        docRef.UpdateAsync("Nickname", newNickname).ContinueWithOnMainThread(task =>
-        {
-            if (task.IsCanceled)
-            {
-                onError?.Invoke("닉네임 변경 작업이 취소되었습니다.");
-                Debug.LogError("닉네임 변경 작업이 취소되었습니다.");
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                onError?.Invoke($"닉네임 변경 중 오류 발생: {task.Exception}");
-                Debug.LogError($"닉네임 변경 중 오류 발생: {task.Exception}");
-                return;
-            }
-
-            myAccountDto.Nickname = newNickname;
-            Debug.Log("닉네임이 성공적으로 변경되었습니다.");
-            onSuccess?.Invoke();
-        });
+        await docRef.UpdateAsync("Nickname", newNickname);
+        myAccountDto.Nickname = newNickname;
+        Debug.Log("닉네임이 성공적으로 변경되었습니다.");
     }
 
+    // Email로 유저 DTO 가져오기
     public async Task<AccountDTO> GetAccountDTOByEmail(string email)
     {
         if (DB == null)
-        {
-            Debug.LogError("Firestore가 초기화되지 않았습니다.");
-            return null;
-        }
+            throw new InvalidOperationException("Firestore가 초기화되지 않았습니다.");
 
-        try
+        var snapshot = await DB.Collection("UserDB").Document(email).GetSnapshotAsync();
+        if (snapshot.Exists)
         {
-            var snapshot = await DB.Collection("UserDB").Document(email).GetSnapshotAsync();
-            if (snapshot.Exists)
-            {
-                var data = snapshot.ToDictionary();
-                string foundEmail = data.ContainsKey("Email") ? data["Email"] as string : null;
-                string nickname = data.ContainsKey("Nickname") ? data["Nickname"] as string : null;
-                string password = data.ContainsKey("Password") ? data["Password"] as string : null;
+            var data = snapshot.ToDictionary();
+            string foundEmail = data.ContainsKey("Email") ? data["Email"] as string : null;
+            string nickname = data.ContainsKey("Nickname") ? data["Nickname"] as string : null;
+            string password = data.ContainsKey("Password") ? data["Password"] as string : null;
 
-                return new AccountDTO(foundEmail, nickname, password);
-            }
-            else
-            {
-                Debug.LogWarning("해당 유저의 데이터가 UserDB에 존재하지 않습니다.");
-                return null;
-            }
+            return new AccountDTO(foundEmail, nickname, password);
         }
-        catch (Exception ex)
+        else
         {
-            Debug.LogError($"유저 정보 조회 중 오류 발생: {ex}");
+            Debug.LogWarning("해당 유저의 데이터가 UserDB에 존재하지 않습니다.");
             return null;
         }
     }

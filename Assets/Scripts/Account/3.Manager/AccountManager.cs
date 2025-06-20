@@ -3,6 +3,7 @@ using Firebase.Extensions;
 using Firebase.Firestore;
 using UnityEngine;
 using TMPro;
+using System.Threading.Tasks;
 
 public class AccountManager : MonoSingleton<AccountManager>
 {
@@ -25,33 +26,47 @@ public class AccountManager : MonoSingleton<AccountManager>
         base.Awake();
     }
 
-    public void Login(string email, string password)
+    public async Task LoginAsync(string email, string password)
     {
         var accountDto = new AccountDTO { Email = email, Password = password };
-        _repo.SignIn(accountDto, email, password,
-            account =>
-            {
-                MyAccount = account; // ToDTO() 호출 필요 없음
-                Debug.Log("계정 생성 및 MyAccount 할당 완료");
-            },
-            error =>
-            {
-                Debug.LogError(error);
-            });
+        try
+        {
+            var result = await _repo.SignInAsync(accountDto, email, password);
+            MyAccount = result;
+            Debug.Log("로그인 및 MyAccount 할당 완료");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"로그인 실패: {ex.Message}");
+        }
     }
 
-    public void CreateAccount(string email, string password, string nickname)
+    public async Task CreateAccountAsync(string email, string password, string nickname)
     {
-        _repo.CreateAccount(email, nickname, password,
-            account =>
-            {
-                MyAccount = account; // ToDTO() 호출 필요 없음
-                Debug.Log("계정 생성 및 MyAccount 할당 완료");
-            },
-            error =>
-            {
-                Debug.LogError(error);
-            });
+        try
+        {
+            var result = await _repo.CreateAccountAsync(email, nickname, password);
+            MyAccount = result;
+            Debug.Log("계정 생성 및 MyAccount 할당 완료");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"계정 생성 실패: {ex.Message}");
+        }
+    }
+
+    public async Task CreateAccountAsync(string email, string password)
+    {
+        try
+        {
+            var result = await _repo.CreateAccountAsync(email, password);
+            MyAccount = result?.ToDTO();
+            Debug.Log("계정 생성 및 MyAccount 할당 완료");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"계정 생성 실패: {ex.Message}");
+        }
     }
 
     public void SignOut()

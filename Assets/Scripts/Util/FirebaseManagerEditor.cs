@@ -1,5 +1,6 @@
 using Firebase.Extensions;
 using System;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
@@ -32,12 +33,11 @@ public class FirebaseManagerEditor : EditorWindow
 
         if (GUILayout.Button("로그인 시도"))
         {
-            // 싱글톤 인스턴스 사용
             var manager = AccountManager.Instance;
             if (manager != null)
             {
-                manager.Login(loginEmail, loginPassword);
-                Debug.Log("로그인 시도 완료");
+                // async 람다로 비동기 처리
+                _ = LoginAsync(manager, loginEmail, loginPassword);
             }
             else
             {
@@ -76,10 +76,7 @@ public class FirebaseManagerEditor : EditorWindow
                 return;
             }
 
-            var repo = new AccountRepository();
-            repo.CreateAccount(signupEmail, signupNickname, signupPassword,
-                account => Debug.Log("계정 생성 성공: " + account.Email),
-                error => Debug.LogError(error));
+            _ = CreateAccountAsync(signupEmail, signupPassword, signupNickname);
         }
 
         GUILayout.Space(10);
@@ -87,20 +84,47 @@ public class FirebaseManagerEditor : EditorWindow
         GUILayout.Label("분신술", EditorStyles.boldLabel);
         if (GUILayout.Button("무작위 계정 1개 생성"))
         {
-            var repo = new AccountRepository();
             string randomId = GenerateRandomString(4);
             string randomEmail = $"user{randomId}@test.com";
             string randomPassword = GenerateRandomPassword(10);
             string randomNickname = GenerateRandomNickname();
 
-            repo.CreateAccount(randomEmail, randomNickname, randomPassword,
-                account => Debug.Log($"무작위 계정 생성 성공: {account.Email} / {account.Nickname}"),
-                error => Debug.LogError(error));
+            _ = CreateAccountAsync(randomEmail, randomPassword, randomNickname);
         }
 
         GUILayout.Space(10);
-
     }
+
+    // 비동기 로그인
+    private async Task LoginAsync(AccountManager manager, string email, string password)
+    {
+        try
+        {
+            await manager.LoginAsync(email, password);
+            Debug.Log("로그인 시도 완료");
+        }
+        catch (Exception ex)
+        {
+            EditorUtility.DisplayDialog("로그인 오류", ex.Message, "확인");
+            Debug.LogError(ex);
+        }
+    }
+
+    // 비동기 계정 생성
+    private async Task CreateAccountAsync(string email, string password, string nickname)
+    {
+        try
+        {
+            await AccountManager.Instance.CreateAccountAsync(email, password, nickname);
+            Debug.Log($"계정 생성 성공: {email} / {nickname}");
+        }
+        catch (Exception ex)
+        {
+            EditorUtility.DisplayDialog("계정 생성 오류", ex.Message, "확인");
+            Debug.LogError(ex);
+        }
+    }
+
     // 임의의 10자리 비밀번호 생성 함수
     private string GenerateRandomPassword(int length)
     {
