@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Threading.Tasks;
 
 public class UIManager : MonoBehaviour
 {
@@ -47,7 +48,7 @@ public class UIManager : MonoBehaviour
         _ = LoginAsync(email, password);
     }
 
-    private async System.Threading.Tasks.Task LoginAsync(string email, string password)
+    private async Task LoginAsync(string email, string password)
     {
         try
         {
@@ -83,7 +84,7 @@ public class UIManager : MonoBehaviour
         _ = CreateAccountAsync(email, password, nickname);
     }
 
-    private async System.Threading.Tasks.Task CreateAccountAsync(string email, string password, string nickname)
+    private async Task CreateAccountAsync(string email, string password, string nickname)
     {
         try
         {
