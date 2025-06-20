@@ -82,7 +82,8 @@ public class PostTestEditor : EditorWindow
         if (GUILayout.Button("좋아요 토글"))
         {
             RunAsync(async () => {
-                bool isLiked = await PostManager.Instance.ToggleLike(targetPostId, authorId);
+                await PostManager.Instance.ToggleLike(targetPostId, authorId);
+                var isLiked = await PostManager.Instance.IsLiked(targetPostId, authorId);
                 Debug.Log(isLiked ? "좋아요 추가됨" : "좋아요 제거됨");
             });
         }

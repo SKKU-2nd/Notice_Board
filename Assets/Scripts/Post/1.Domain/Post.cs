@@ -75,18 +75,18 @@ public class Post
         }
     }
 
-    public bool IsLiked(string requesterId)
+    public bool IsLiked(string userID)
     {
-        if (string.IsNullOrWhiteSpace(requesterId))
+        if (string.IsNullOrWhiteSpace(userID))
         {
             throw new Exception("유효하지 않은 사용자 ID입니다.");
         }
         
-        return _likeUserIDList.Contains(requesterId);
+        return _likeUserIDList.Contains(userID);
     }
 
     // 좋아요 추가 / 삭제
-    public bool SetLike(string userID)
+    public void SetLike(string userID)
     {
         if (string.IsNullOrWhiteSpace(userID))
         {
@@ -97,13 +97,11 @@ public class Post
         {
             // 추가된 경우
             _likeUserIDList.Add(userID);
-            return true;
         }
         else
         {
             // 이미 있었다면 삭제
             _likeUserIDList.Remove(userID);
-            return false;
         }
     }
 

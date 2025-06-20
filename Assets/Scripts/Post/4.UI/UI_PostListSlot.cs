@@ -40,7 +40,7 @@ public class UI_PostListSlot : MonoBehaviour
         
         _timeText.text = _postDTO.CreatedAt.ToString("yyyy-MM-dd");
 
-        _likeButton.PostId = _postDTO.PostId;
+        _likeButton.Refresh(postDto.IsLiked(AccountManager.Instance.MyAccount.Email));
         
         _contentText.text = _postDTO.Content;
         string information = $"좋아요 {postDto.LikeCount} 댓글 {postDto.CommentCount}";

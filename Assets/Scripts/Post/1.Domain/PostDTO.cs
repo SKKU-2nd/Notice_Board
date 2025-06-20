@@ -26,4 +26,9 @@ public class PostDTO
         : this(post.PostId, post.AuthorID, post.Content, post.CreatedAt, post.LikeUserIDList, post.CommentCount)
     {
     }
+    
+    public bool IsLiked(string userID)
+    {
+        return LikeUserIDList.Contains(userID);
+    }
 }

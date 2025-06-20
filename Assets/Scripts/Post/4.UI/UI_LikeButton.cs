@@ -17,16 +17,6 @@ public class UI_LikeButton : MonoBehaviour
 
     private string _postId;
 
-    public string PostId
-    {
-        get => _postId;
-        set
-        {
-            _postId = value;
-            Init();
-        }
-    }
-
     private void Awake()
     {
         _button = GetComponent<Button>();
@@ -34,16 +24,13 @@ public class UI_LikeButton : MonoBehaviour
         _button.onClick.AddListener(ToggleLike);
     }
 
-    private async void Init()
-    {
-        var result = await PostManager.Instance.IsLiked(PostId, AccountManager.Instance.MyAccount.Email);
-        _heartImage.sprite = result ? _likeOnSprite : _likeOffSprite;
-    }
-
     private async void ToggleLike()
     {
-        bool result = await PostManager.Instance.ToggleLike(PostId, AccountManager.Instance.MyAccount.Email);
-        // 하트 온오프
-        _heartImage.sprite = result ? _likeOnSprite : _likeOffSprite;
+        await PostManager.Instance.ToggleLike(_postId, AccountManager.Instance.MyAccount.Email);
+    }
+
+    public async void Refresh(bool active)
+    {
+        _heartImage.sprite = active ? _likeOnSprite : _likeOffSprite;
     }
 }

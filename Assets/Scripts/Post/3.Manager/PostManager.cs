@@ -87,17 +87,17 @@ public class PostManager : MonoSingleton<PostManager>
         return post.IsLiked(userId);
     }
 
-    public async Task<bool> ToggleLike(string postId, string userId)
+    public async Task ToggleLike(string postId, string userId)
     {
         EnsureRepository();
 
         var postDto = await _postRepository.GetPost(postId);
         var post = new Post(postDto);
 
-        bool isLiked = post.SetLike(userId);
+        post.SetLike(userId);
         await _postRepository.UpdatePost(post.ToDto());
-
-        return isLiked;
+        
+        OnDataChanged?.Invoke();
     }
 
     public async Task IncrementCommentCount(string postId)
