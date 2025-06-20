@@ -31,8 +31,9 @@ public class AccountRepository
         string foundEmail = data.ContainsKey("Email") ? data["Email"] as string : null;
         string nickname = data.ContainsKey("Nickname") ? data["Nickname"] as string : null;
         string foundPassword = data.ContainsKey("Password") ? data["Password"] as string : null;
+        string profilePath = data.ContainsKey("ProfilePath") ? data["ProfilePath"] as string : null;
 
-        var dto = new AccountDTO(foundEmail, nickname, foundPassword);
+        var dto = new AccountDTO(foundEmail, nickname, foundPassword, profilePath);
         myAccountDto.Email = dto.Email;
         myAccountDto.Nickname = dto.Nickname;
         myAccountDto.Password = dto.Password;
@@ -127,8 +128,9 @@ public class AccountRepository
             string foundEmail = data.ContainsKey("Email") ? data["Email"] as string : null;
             string nickname = data.ContainsKey("Nickname") ? data["Nickname"] as string : null;
             string password = data.ContainsKey("Password") ? data["Password"] as string : null;
+            string profilePath = data.ContainsKey("ProfilePath") ? data["ProfilePath"] as string : null;
 
-            return new AccountDTO(foundEmail, nickname, password);
+            return new AccountDTO(foundEmail, nickname, password, profilePath);
         }
         else
         {
