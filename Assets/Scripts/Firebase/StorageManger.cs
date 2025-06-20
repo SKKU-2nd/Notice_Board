@@ -42,6 +42,10 @@ public class StorageManger : MonoSingleton<StorageManger>
 
     public async Task LoadImageToUI(string imagePath, Image targetImage)
     {
+        // 경로가 null/공란이면 default.jpg로 대체
+        if (string.IsNullOrWhiteSpace(imagePath))
+            imagePath = "images/default.jpg";
+
         Uri downloadUri = await GetDownloadUrl(imagePath);
         if (downloadUri == null)
         {
@@ -58,6 +62,10 @@ public class StorageManger : MonoSingleton<StorageManger>
 
     public async Task<Uri> GetDownloadUrl(string imagePath)
     {
+        // 경로가 null/공란이면 default.jpg로 대체
+        if (string.IsNullOrWhiteSpace(imagePath))
+            imagePath = "images/default.jpg";
+
         try
         {
             EnsureStorage();

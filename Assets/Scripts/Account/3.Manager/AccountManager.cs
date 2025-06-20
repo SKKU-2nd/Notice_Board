@@ -4,6 +4,7 @@ using Firebase.Firestore;
 using UnityEngine;
 using TMPro;
 using System.Threading.Tasks;
+using System;
 
 public class AccountManager : MonoSingleton<AccountManager>
 {
@@ -38,6 +39,7 @@ public class AccountManager : MonoSingleton<AccountManager>
         catch (System.Exception ex)
         {
             Debug.LogError($"로그인 실패: {ex.Message}");
+            throw new Exception($"로그인 실패: {ex.Message}");
         }
     }
 
@@ -52,6 +54,7 @@ public class AccountManager : MonoSingleton<AccountManager>
         catch (System.Exception ex)
         {
             Debug.LogError($"계정 생성 실패: {ex.Message}");
+            throw new Exception($"계정 생성 실패: {ex.Message}");
         }
     }
 

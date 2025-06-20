@@ -35,6 +35,11 @@ public class Account
             throw new ArgumentException(passwordSpec.GetErrorMessage(password));
         }
 
+        if(string.IsNullOrEmpty(profilepath))
+        {
+            profilepath = "images/default.jpg";
+        }
+
         Email = email;
         Nickname = nickname;
         Password = password;

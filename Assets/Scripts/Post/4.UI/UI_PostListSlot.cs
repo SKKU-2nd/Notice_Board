@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -49,7 +49,10 @@ public class UI_PostListSlot : MonoBehaviour
         _contentText.text = _postDTO.Content;
         string information = $"좋아요 {postDto.LikeCount} 댓글 {postDto.CommentCount}";
         _informationText.text = information;
-        
+
+        await StorageManger.Instance.LoadImageToUI(author.ProfilePath, _profileImage);
+
+
         _uiText.TextChanged();
     }
 }
