@@ -36,13 +36,6 @@ public class FirebaseManagerEditor : EditorWindow
             var manager = AccountManager.Instance;
             if (manager != null)
             {
-                // 리플렉션으로 private 필드에 값 할당
-                var emailField = typeof(AccountManager).GetField("_email", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                var passwordField = typeof(AccountManager).GetField("_password", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-                emailField.SetValue(manager, loginEmail);
-                passwordField.SetValue(manager, loginPassword);
-
                 manager.Login(loginEmail, loginPassword);
                 Debug.Log("로그인 시도 완료");
             }
