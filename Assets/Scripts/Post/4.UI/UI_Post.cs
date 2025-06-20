@@ -17,6 +17,8 @@ public class UI_Post : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI _userNicknameText;
     [SerializeField]
+    private Image _profileSprite; 
+    [SerializeField]
     private TextMeshProUGUI _infoText;
     [SerializeField]
     private List<Button> _backButton;
@@ -47,9 +49,13 @@ public class UI_Post : MonoBehaviour
         gameObject.SetActive(true);
         _writeComment.PostID = postDto.PostId;
         _contentText.text = postDto.Content;
-        // 유저 정보 가져와서 넣기
-        // var user = AccountManager.Instance.GetAccountDTO(AuthorID);
-        _userNicknameText.text = postDto.AuthorID;
+
+        var authorDto = await AccountManager.Instance.GetAccountDTOByEmailAsync(postDto.AuthorID);
+        _userNicknameText.text = authorDto?.Nickname ?? "등록되지않은 사용자";
+
+        var profilePath = authorDto?.ProfilePath;
+        await StorageManger.Instance.LoadImageToUI(profilePath, _profileSprite);
+
         string information = $"{postDto.CreatedAt}";
         _infoText.text = information;
 
