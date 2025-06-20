@@ -19,8 +19,6 @@ public class PostManager : MonoSingleton<PostManager>
     private void Init()
     {
         _posts = new List<PostDTO>();
-
-        EnsureRepository();
     }
 
     public async Task CreatePost(string authorId, string content)

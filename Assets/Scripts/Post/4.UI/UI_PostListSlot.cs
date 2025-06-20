@@ -20,19 +20,15 @@ public class UI_PostListSlot : MonoBehaviour
     private UI_LikeButton _likeButton;
     [SerializeField]
     private List<Button> _postShowButtons;
+    [SerializeField]
+    private UI_Text _uiText;
+    
     public List<Button> PostShowButtons => _postShowButtons;
     
     private PostDTO _postDTO;
     public PostDTO PostDTO => _postDTO;
-    
-    private UI_Text _uiText;
 
     public event Action<PostDTO> PostShow;
-
-    private void Awake()
-    {
-        _uiText = GetComponentInChildren<UI_Text>();
-    }
 
     public async void Refresh(PostDTO postDto)
     {
@@ -51,8 +47,7 @@ public class UI_PostListSlot : MonoBehaviour
         _informationText.text = information;
 
         await StorageManger.Instance.LoadImageToUI(author.ProfilePath, _profileImage);
-
-
+        
         _uiText.TextChanged();
     }
 }
