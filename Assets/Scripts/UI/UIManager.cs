@@ -32,6 +32,16 @@ public class UIManager : MonoBehaviour
     private Button createAccountConfirmButton;
     [SerializeField]
     private Button createAccountCancelButton;
+    
+    [Header("게시판")]
+    [SerializeField]
+    private GameObject _postListPanel;
+    
+    [Header("글작성")]
+    [SerializeField]
+    private Button _showPostWriteButton;
+    [SerializeField]
+    private GameObject _postWritePanel;
 
     private void Awake()
     {
@@ -39,6 +49,15 @@ public class UIManager : MonoBehaviour
         createAccountButton.onClick.AddListener(OnCreateAccountButtonClicked);
         createAccountConfirmButton.onClick.AddListener(OnCreateAccountConfirmButtonClicked);
         createAccountCancelButton.onClick.AddListener(OnCreateAccountCancelButtonClicked);
+        _showPostWriteButton.onClick.AddListener(ShowPostWritePanel);
+    }
+
+    private void ShowPostWritePanel()
+    {
+        loginPanel.SetActive(false);
+        createAccountPanel.SetActive(false);
+        _postListPanel.SetActive(false);
+        _postWritePanel.SetActive(true);
     }
 
     private void OnLoginButtonClicked()
@@ -53,6 +72,7 @@ public class UIManager : MonoBehaviour
         try
         {
             await AccountManager.Instance.LoginAsync(email, password);
+            _postListPanel.SetActive(true);
             Debug.Log("로그인 성공");
             // 로그인 성공 후 UI 처리 추가 가능
         }

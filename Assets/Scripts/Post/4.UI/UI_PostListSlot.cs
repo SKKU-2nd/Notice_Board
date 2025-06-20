@@ -6,6 +6,12 @@ using UnityEngine.UI;
 public class UI_PostListSlot : MonoBehaviour
 {
     [SerializeField]
+    private Image _profileImage;
+    [SerializeField]
+    private TextMeshProUGUI _nickNameText;
+    [SerializeField]
+    private TextMeshProUGUI _timeText;
+    [SerializeField]
     private TextMeshProUGUI _contentText;
     [SerializeField]
     private TextMeshProUGUI _informationText;
@@ -26,16 +32,20 @@ public class UI_PostListSlot : MonoBehaviour
         _uiText = GetComponentInChildren<UI_Text>();
     }
 
-    public void Refresh(PostDTO postDto)
+    public async void Refresh(PostDTO postDto)
     {
         _postDTO = postDto;
+
+        var author = await AccountManager.Instance.GetAccountDTOByEmailAsync(_postDTO.AuthorID);
+
+        _nickNameText.text = author.Nickname;
+        
+        _timeText.text = _postDTO.CreatedAt.ToString("yyyy-MM-dd");
 
         _likeButton.PostId = _postDTO.PostId;
         
         _contentText.text = _postDTO.Content;
-        // 유저 정보 가져와서 넣기
-        // var user = AccountManager.Instance.
-        string information = $"{_postDTO.CreatedAt} {_postDTO.AuthorID} {_postDTO.CommentCount}";
+        string information = $"좋아요 {postDto.LikeCount} 댓글 {postDto.CommentCount}";
         _informationText.text = information;
         
         _uiText.TextChanged();

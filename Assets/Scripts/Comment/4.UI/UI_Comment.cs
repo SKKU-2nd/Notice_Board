@@ -21,5 +21,6 @@ public class UI_Comment : MonoBehaviour
         gameObject.SetActive(true);
         _commentText.text = comment.Content;
         // 유저 정보 가져와서 하기
+        // AccountManager.Instance.
     }
 }

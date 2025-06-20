@@ -22,11 +22,17 @@ public class UI_LikeButton : MonoBehaviour
         _button = GetComponent<Button>();
 
         _button.onClick.AddListener(ToggleLike);
+        Init();
+    }
+
+    private async void Init()
+    {
+        // _heartImage.sprite = result ? _likeOnSprite : _likeOffSprite;
     }
 
     private async void ToggleLike()
     {
-        bool result = await PostManager.Instance.ToggleLike(PostId, AccountManager.Instance.MyAccount.AccountID);
+        bool result = await PostManager.Instance.ToggleLike(PostId, AccountManager.Instance.MyAccount.Email);
         // 하트 온오프
         _heartImage.sprite = result ? _likeOnSprite : _likeOffSprite;
     }

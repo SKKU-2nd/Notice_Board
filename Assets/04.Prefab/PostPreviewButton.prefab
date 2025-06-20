@@ -607,6 +607,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79468893854e4516a771ad66f5295278, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _profileImage: {fileID: 4383030622764279419}
+  _nickNameText: {fileID: 9170082918527192252}
+  _timeText: {fileID: 8684824612390622886}
   _contentText: {fileID: 754176994823462525}
   _informationText: {fileID: 8383635842071181816}
   _likeButton: {fileID: 2558056289172467773}
