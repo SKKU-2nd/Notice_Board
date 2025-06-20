@@ -34,6 +34,7 @@ public class UI_PostListSlot : MonoBehaviour
     {
         _postDTO = postDto;
 
+        _likeButton.PostId = _postDTO.PostId;
         var author = await AccountManager.Instance.GetAccountDTOByEmailAsync(_postDTO.AuthorID);
 
         _nickNameText.text = author.Nickname;

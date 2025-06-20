@@ -16,6 +16,7 @@ public class UI_LikeButton : MonoBehaviour
     private Button _button;
 
     private string _postId;
+    public string PostId { get => _postId; set => _postId = value; } 
 
     private void Awake()
     {
@@ -32,5 +33,6 @@ public class UI_LikeButton : MonoBehaviour
     public async void Refresh(bool active)
     {
         _heartImage.sprite = active ? _likeOnSprite : _likeOffSprite;
+        _heartImage.alphaHitTestMinimumThreshold = 0f;
     }
 }

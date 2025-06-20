@@ -7,13 +7,14 @@ public class UI_PostList : MonoBehaviour
 {
     [SerializeField]
     private UI_Post _postUI;
+
     [SerializeField]
     private GameObject _postPreviewSlotPrefab;
-    
+
     [Header("콘텐츠")]
     [SerializeField]
     private Transform _content;
-    
+
     private List<UI_PostListSlot> _postSlotList;
 
     private void Start()
@@ -24,12 +25,12 @@ public class UI_PostList : MonoBehaviour
 
     private async void OnEnable()
     {
-        await PostManager.Instance.GetPosts();
+        Refresh();
     }
 
-    private void Refresh()
+    private async void Refresh()
     {
-        var postList = PostManager.Instance.GetCachedPosts();
+        var postList = await PostManager.Instance.GetPosts();
 
         for (int i = 0; i < postList.Count; i++)
         {
@@ -40,18 +41,20 @@ public class UI_PostList : MonoBehaviour
                 {
                     showButtons.onClick.AddListener(() => ShowPost(slot.PostDTO));
                 }
+
                 _postSlotList.Add(slot);
             }
+
             _postSlotList[i].Refresh(postList[i]);
         }
-        
+
         for (int i = postList.Count; i < _postSlotList.Count; i++)
         {
             _postSlotList[i].gameObject.SetActive(false);
         }
     }
-    
-    
+
+
     private void ShowPost(PostDTO post)
     {
         _postUI.Refresh(post);

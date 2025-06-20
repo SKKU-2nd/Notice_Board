@@ -5,21 +5,10 @@ using UnityEngine;
 
 public class PostManager : MonoSingleton<PostManager>
 {
-    private List<PostDTO> _posts;
     private PostRepository _postRepository;
 
     // 게시글 목록 변경 시 UI에 알림
     public event Action OnDataChanged;
-
-    private void Start()
-    {
-        Init();
-    }
-
-    private void Init()
-    {
-        _posts = new List<PostDTO>();
-    }
 
     public async Task CreatePost(string authorId, string content)
     {
@@ -34,12 +23,11 @@ public class PostManager : MonoSingleton<PostManager>
         await _postRepository.AddPost(docRef, postDto);
     }
 
-    public async Task GetPosts()
+    public async Task<List<PostDTO>> GetPosts()
     {
         EnsureRepository();
-
-        _posts = await _postRepository.GetPosts();
-        OnDataChanged?.Invoke();
+        
+        return await _postRepository.GetPosts();
     }
 
     public async Task<PostDTO> GetPost(string postId)
@@ -110,8 +98,6 @@ public class PostManager : MonoSingleton<PostManager>
         post.SetCommentCount(postDto.CommentCount + 1);
         await _postRepository.UpdatePost(post.ToDto());
     }
-
-    public IReadOnlyList<PostDTO> GetCachedPosts() => _posts;
 
     private void EnsureRepository()
     {

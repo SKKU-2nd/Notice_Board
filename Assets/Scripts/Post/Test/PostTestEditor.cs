@@ -30,8 +30,8 @@ public class PostTestEditor : EditorWindow
         if (GUILayout.Button("게시글 목록 조회"))
         {
             RunAsync(async () => {
-                await PostManager.Instance.GetPosts();
-                foreach (var post in PostManager.Instance.GetCachedPosts())
+                var data = await PostManager.Instance.GetPosts();
+                foreach (var post in data)
                 {
                     Debug.Log(
                         $"PostID: {post.PostId}\n" +
