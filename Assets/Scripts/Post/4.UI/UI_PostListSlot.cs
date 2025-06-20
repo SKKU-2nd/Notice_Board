@@ -9,6 +9,8 @@ public class UI_PostListSlot : MonoBehaviour
     private TextMeshProUGUI _contentText;
     [SerializeField]
     private TextMeshProUGUI _informationText;
+    [SerializeField]
+    private UI_LikeButton _likeButton;
     
     private PostDTO _postDTO;
     public PostDTO PostDTO => _postDTO;
@@ -27,6 +29,8 @@ public class UI_PostListSlot : MonoBehaviour
     public void Refresh(PostDTO postDto)
     {
         _postDTO = postDto;
+
+        _likeButton.PostId = _postDTO.PostId;
         
         _contentText.text = _postDTO.Content;
         // 유저 정보 가져와서 넣기

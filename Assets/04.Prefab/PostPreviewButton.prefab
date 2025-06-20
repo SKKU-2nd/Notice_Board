@@ -609,6 +609,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _contentText: {fileID: 754176994823462525}
   _informationText: {fileID: 8383635842071181816}
+  _likeButton: {fileID: 2558056289172467773}
 --- !u!114 &9201424671196737400
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -699,6 +700,7 @@ GameObject:
   - component: {fileID: 2953937831407871348}
   - component: {fileID: 6118310206196125778}
   - component: {fileID: 4225672416464655433}
+  - component: {fileID: 2558056289172467773}
   m_Layer: 5
   m_Name: LikeButton
   m_TagString: Untagged
@@ -809,6 +811,21 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &2558056289172467773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2601844973038894787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e47ee195746c8c342a198fda5722a301, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _likeOnSprite: {fileID: 21300000, guid: 0846a8c8b2fc3bf49a55386a36c19adc, type: 3}
+  _likeOffSprite: {fileID: 21300000, guid: 020d427a6d275f14aa1566bd2fd834bb, type: 3}
+  _heartImage: {fileID: 7863159772887674678}
 --- !u!1 &2822299408965904365
 GameObject:
   m_ObjectHideFlags: 0
