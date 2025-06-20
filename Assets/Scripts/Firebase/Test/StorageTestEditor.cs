@@ -1,12 +1,13 @@
-﻿using System.IO;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using System.Threading.Tasks;
+using System.IO;
 
 public class StorageTestEditor : EditorWindow
 {
-    private string firebaseImagePath = "images/test.jpg";  // Firebase Storage 내부 경로
-    private string selectedLocalFilePath = "";
+    private string firebaseImagePath = "images/test.jpg";   // Storage 내 경로
+    private string selectedLocalFilePath = "";              // 로컬 파일 경로
+    private Sprite previewSprite;                           // 다운로드된 Sprite 미리보기용
 
     [MenuItem("Tools/Storage 기능 테스트")]
     public static void ShowWindow()
@@ -29,7 +30,8 @@ public class StorageTestEditor : EditorWindow
             else
                 Debug.LogWarning("파일 선택 취소됨");
         }
-        
+
+        // ✅ 에디터에 로컬 이미지 경로 표시
         if (!string.IsNullOrEmpty(selectedLocalFilePath))
         {
             EditorGUILayout.HelpBox($"선택된 파일 경로:\n{selectedLocalFilePath}", MessageType.Info);
@@ -66,6 +68,7 @@ public class StorageTestEditor : EditorWindow
                 var sprite = await StorageManger.Instance.DownloadSprite(url);
                 if (sprite != null)
                 {
+                    previewSprite = sprite; // ✅ 미리보기용 저장
                     Debug.Log($"Sprite 생성 완료 - Size: {sprite.texture.width} x {sprite.texture.height}");
                 }
                 else
@@ -75,22 +78,19 @@ public class StorageTestEditor : EditorWindow
             });
         }
 
-        if (GUILayout.Button("에디터 창에서 직접 Sprite 텍스처 미리보기"))
+        // ✅ Sprite.texture로 이미지 미리보기
+        if (previewSprite != null)
         {
-            RunAsync(async () =>
+            GUILayout.Space(10);
+            GUILayout.Label("다운로드된 이미지 미리보기", EditorStyles.boldLabel);
+
+            Rect previewRect = GUILayoutUtility.GetRect(256, 256, GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(false));
+            Texture2D tex = previewSprite.texture;
+
+            if (tex != null)
             {
-                var url = await StorageManger.Instance.GetDownloadUrl(firebaseImagePath);
-                var sprite = await StorageManger.Instance.DownloadSprite(url);
-                if (sprite != null)
-                {
-                    Texture2D tex = sprite.texture;
-                    byte[] png = tex.EncodeToPNG();
-                    string savePath = Path.Combine(Application.dataPath, "DownloadedImage.png");
-                    File.WriteAllBytes(savePath, png);
-                    Debug.Log($"이미지 저장 완료: {savePath}");
-                    AssetDatabase.Refresh();
-                }
-            });
+                GUI.DrawTexture(previewRect, tex, ScaleMode.ScaleToFit);
+            }
         }
     }
 
